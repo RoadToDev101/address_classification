@@ -1,6 +1,6 @@
 # Vietnamese Address Classification
 
-A high-performance algorithmic solution for parsing and classifying Vietnamese addresses (old, before merging) into province, district, and ward components using dynamic programming and fuzzy string matching techniques.
+A high-performance algorithmic solution for parsing and classifying Vietnamese addresses (old, before the event "Rearrange and merge administrative units" in 2024–2025) into province, district, and ward components using dynamic programming and fuzzy string matching techniques.
 
 ## Problem Statement
 
