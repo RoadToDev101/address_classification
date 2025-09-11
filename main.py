@@ -2,6 +2,7 @@ import re
 import time
 import unicodedata
 import json
+import csv
 from functools import lru_cache
 from typing import Dict, List, Optional, Tuple
 from collections import defaultdict, Counter
@@ -488,7 +489,7 @@ def test_classifier():
         print(f"Error parsing JSON file: {e}")
         return
 
-    # Convert JSON data to test cases format
+    # Convert JSON data to test cases format (carry optional notes)
     tests = []
     for item in test_data:
         test_case = (
@@ -498,6 +499,7 @@ def test_classifier():
                 "district": item["expected_district"],
                 "ward": item["expected_ward"],
             },
+            item.get("notes", ""),
         )
         tests.append(test_case)
 
@@ -509,8 +511,9 @@ def test_classifier():
     correct_count = 0
     total_time = 0
     max_time = 0
+    failed_cases = []
 
-    for i, (address, expected) in enumerate(tests, 1):
+    for i, (address, expected, notes) in enumerate(tests, 1):
         # Time each classification
         t0 = time.perf_counter()
         got = classifier.classify(address)
@@ -518,10 +521,39 @@ def test_classifier():
         total_time += dt
         max_time = max(max_time, dt)
 
-        # Check accuracy
-        ok = all(got.get(k) == v for k, v in expected.items())
+        # Check accuracy and timing constraint (<= 100ms)
+        prediction_ok = all(got.get(k) == v for k, v in expected.items())
+        time_ok = dt <= 100.0
+        ok = prediction_ok and time_ok
         if ok:
             correct_count += 1
+        else:
+            reasons = []
+            if not prediction_ok:
+                for k in ("province", "district", "ward"):
+                    if got.get(k) != expected.get(k):
+                        reasons.append(f"{k} mismatch")
+            if not time_ok:
+                reasons.append(f"time_exceeded ({dt:.2f} ms > 100 ms)")
+            fail_reason = "; ".join(reasons) if reasons else "unknown"
+
+            normalized = classifier._normalize(address)
+            failed_cases.append(
+                {
+                    "index": i,
+                    "input": address,
+                    "normalized": normalized,
+                    "notes": notes,
+                    "expected_province": expected.get("province"),
+                    "expected_district": expected.get("district"),
+                    "expected_ward": expected.get("ward"),
+                    "got_province": got.get("province"),
+                    "got_district": got.get("district"),
+                    "got_ward": got.get("ward"),
+                    "time_ms": round(dt, 3),
+                    "fail_reason": fail_reason,
+                }
+            )
 
         print(f"\nTest {i}:")
         print(f"Input: {address}")
@@ -549,6 +581,35 @@ def test_classifier():
     print("=" * 80)
     print(f"Average time ≤ 10ms: {'✓' if avg_time <= 10 else '✗'} ({avg_time:.2f} ms)")
     print(f"Max time ≤ 100ms: {'✓' if max_time <= 100 else '✗'} ({max_time:.2f} ms)")
+
+    # Export failing cases for further analysis
+    print("\n" + "=" * 80)
+    print("EXPORTING FAILED CASES")
+    print("=" * 80)
+    try:
+        # CSV export
+        csv_headers = [
+            "index",
+            "input",
+            "normalized",
+            "notes",
+            "expected_province",
+            "expected_district",
+            "expected_ward",
+            "got_province",
+            "got_district",
+            "got_ward",
+            "time_ms",
+            "fail_reason",
+        ]
+        with open("failed_cases.csv", "w", encoding="utf-8-sig", newline="") as cf:
+            writer = csv.DictWriter(cf, fieldnames=csv_headers)
+            writer.writeheader()
+            for row in failed_cases:
+                writer.writerow(row)
+        print(f"Wrote failed cases CSV: failed_cases.csv ({len(failed_cases)} rows)")
+    except Exception as e:
+        print(f"Failed to export failed cases: {e}")
 
 
 def load_from_csv(data_dir: str = "data") -> AddressClassifier:
