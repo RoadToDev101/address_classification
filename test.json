@@ -1,0 +1,4586 @@
+[
+  {
+    "input": "Phường Phúc Xá, Quận Ba Đình, Thành phố Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Phuc Xa, Ba Dinh, Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Phúc Xá, Q. Ba Đình, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hà Nội - Ba Đình - Phúc Xá",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Phúc Xá, Ba Đình",
+    "expected_province": null,
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "missing province"
+  },
+  {
+    "input": "Ba Đình, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Ba Dinh Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Phúc Xá",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "ward only"
+  },
+  {
+    "input": "phúc sá, Ba Đình, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "PPhúc Xá, Ba Đình, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Phúc Xá, ba đìn, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "phúc sá, ba đìn, Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "ba đìn, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Ba ĐĐình, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Hà Nộii",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Ba , Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "PHÚC XÁ, ba đình, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Phúc Xá  ,  Ba Đình  ,  Hà Nội  ",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Phúc Xá; Ba Đình; Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": "Phúc Xá",
+    "group": "A",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Ba Đình Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Ba Đình",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Hàng Mã, Quận Hoàn Kiếm, Thành phố Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Hang Ma, Hoan Kiem, Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Hàng Mã, Q. Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hà Nội - Hoàn Kiếm - Hàng Mã",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Hàng Mã, Hoàn Kiếm",
+    "expected_province": null,
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "missing province"
+  },
+  {
+    "input": "Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Hoan Kiem Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Hàng Mã",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "ward only"
+  },
+  {
+    "input": "HHàng Mã, Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "HàngMã, Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Hàng Mã, Hoàn KKiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "HHàng Mã, Hoàn KKiếm, Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Hoàn KKiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Hoàn Kimế, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Hà Nộii",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Hoà, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "HÀNG MÃ, hoàn kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Hàng Mã  ,  Hoàn Kiếm  ,  Hà Nội  ",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Hàng Mã; Hoàn Kiếm; Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Hàng Mã",
+    "group": "B",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Hoàn Kiếm Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Bến Nghé, Quận 1, Thành phố Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Ben Nghe, 1, Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Bến Nghé, Q. 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hồ Chí Minh - 1 - Bến Nghé",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Bến Nghé, 1",
+    "expected_province": null,
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "missing province"
+  },
+  {
+    "input": "1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district and province only"
+  },
+  {
+    "input": "1 Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Bến Nghé",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "ward only"
+  },
+  {
+    "input": "Bếến Nghé, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "ếBn Nghé, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Hồ Chí Minnh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "BẾN NGHÉ, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Bến Nghé  ,  1  ,  Hồ Chí Minh  ",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Bến Nghé; 1; Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Nghé",
+    "group": "C",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "1 Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Bến Thành, Quận 1, Thành phố Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Ben Thanh, 1, Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Bến Thành, Q. 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hồ Chí Minh - 1 - Bến Thành",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Bến Thành, 1",
+    "expected_province": null,
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "missing province"
+  },
+  {
+    "input": "1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district and province only"
+  },
+  {
+    "input": "1 Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Bến Thành",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "ward only"
+  },
+  {
+    "input": "Bến Thàành, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "BBến Thành, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Hồ Chí Minnh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "BẾN THÀNH, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Bến Thành  ,  1  ,  Hồ Chí Minh  ",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Bến Thành; 1; Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Bến Thành",
+    "group": "D",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "1 Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Thịnh Sơn, Quận Đô Lương, Thành phố Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Thinh Son, Do Luong, Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Thịnh Sơn, Q. Đô Lương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Nghệ An - Đô Lương - Thịnh Sơn",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Thịnh Sơn, Đô Lương",
+    "expected_province": null,
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "missing province"
+  },
+  {
+    "input": "Đô Lương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Do Luong Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Thịnh Sơn",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "ward only"
+  },
+  {
+    "input": "Thịnh Sn, Đô Lương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Thịn Sơn, Đô Lương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Thịnh Sơn, Đ Lương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Thịnh Sn, Đ Lương, Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Đ Lương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "ĐôLương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Ngh An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Đô , Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "THỊNH SƠN, đô lương, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Thịnh Sơn  ,  Đô Lương  ,  Nghệ An  ",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Thịnh Sơn; Đô Lương; Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": "Thịnh Sơn",
+    "group": "E",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Đô Lương Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Đô Lương",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Hải Châu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Hải Châu",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Hai Chau Da Nang",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Hải Châu",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Hải hâu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Hải Châu",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Hảii Châu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Hải Châu",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "ĐĐà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Hải, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Hải Châu",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "Hải Châu Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Hải Châu",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Ninh Kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Ninh Kieu Can Tho",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "nin kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Nihn Kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Cần TThơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Nin, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "Ninh Kiều Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Phúc Tân, Quận Hoàn Kiếm, Thành phố Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Phuc Tan, Hoan Kiem, Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Phúc Tân, Q. Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hà Nội - Hoàn Kiếm - Phúc Tân",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Phúc Tân, Hoàn Kiếm",
+    "expected_province": null,
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "missing province"
+  },
+  {
+    "input": "Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Hoan Kiem Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Phúc Tân",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "ward only"
+  },
+  {
+    "input": "Phúc Tan, Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "ward with diacritic variation"
+  },
+  {
+    "input": "Phúc ân, Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Phúc Tânn, Hoàn Kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Phúc Tân, Hoàn KKiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Phúc ân, Hoàn KKiếm, Ha Noi",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Hoàn KKiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Hoàn Kimế, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Hà Nộii",
+    "expected_province": "Hà Nội",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Hoà, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "PHÚC TÂN, hoàn kiếm, Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Phúc Tân  ,  Hoàn Kiếm  ,  Hà Nội  ",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Phúc Tân; Hoàn Kiếm; Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": "Phúc Tân",
+    "group": "H",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Hoàn Kiếm Hà Nội",
+    "expected_province": "Hà Nội",
+    "expected_district": "Hoàn Kiếm",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Tân Định, Quận 1, Thành phố Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Tan Dinh, 1, Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Tân Định, Q. 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hồ Chí Minh - 1 - Tân Định",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Tân Định, 1",
+    "expected_province": null,
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "missing province"
+  },
+  {
+    "input": "1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "district and province only"
+  },
+  {
+    "input": "1 Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "I",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "I",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Tân Định",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "ward only"
+  },
+  {
+    "input": "Tan Định, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "ward with diacritic variation"
+  },
+  {
+    "input": "Tân ịnh, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Tân Đnịh, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Hồ Chí Minnh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "I",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "TÂN ĐỊNH, 1, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Tân Định  ,  1  ,  Hồ Chí Minh  ",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Tân Định; 1; Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": "Tân Định",
+    "group": "I",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "1 Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "1",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Thạnh Xuân, Quận 12, Thành phố Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Thanh Xuan, 12, Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Thạnh Xuân, Q. 12, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hồ Chí Minh - 12 - Thạnh Xuân",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Thạnh Xuân, 12",
+    "expected_province": null,
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "missing province"
+  },
+  {
+    "input": "12, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "district and province only"
+  },
+  {
+    "input": "12 Ho Chi Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "J",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "J",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Thạnh Xuân",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "ward only"
+  },
+  {
+    "input": "Thạnh Xuan, 12, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "ward with diacritic variation"
+  },
+  {
+    "input": "Thạnh Xuuân, 12, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Thạnh Xuâân, 12, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Hồ Chí Minnh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "J",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "THẠNH XUÂN, 12, Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Thạnh Xuân  ,  12  ,  Hồ Chí Minh  ",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Thạnh Xuân; 12; Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": "Thạnh Xuân",
+    "group": "J",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "12 Hồ Chí Minh",
+    "expected_province": "Hồ Chí Minh",
+    "expected_district": "12",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Đông Vĩnh, Quận Vinh, Thành phố Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Dong Vinh, Vinh, Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Đông Vĩnh, Q. Vinh, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Nghệ An - Vinh - Đông Vĩnh",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Đông Vĩnh, Vinh",
+    "expected_province": null,
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "missing province"
+  },
+  {
+    "input": "Vinh, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Vinh Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Đông Vĩnh",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "ward only"
+  },
+  {
+    "input": "Đong Vĩnh, Vinh, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "ward with diacritic variation"
+  },
+  {
+    "input": "Đông ĩnh, Vinh, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Đông Vĩĩnh, Vinh, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Đông Vĩnh, vin, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Đông ĩnh, vin, Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "vin, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Vnih, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Ngh An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "ĐÔNG VĨNH, vinh, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Đông Vĩnh  ,  Vinh  ,  Nghệ An  ",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Đông Vĩnh; Vinh; Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": "Đông Vĩnh",
+    "group": "A",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Vinh Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Vinh",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Nghi Thuỷ, Quận Cửa Lò, Thành phố Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Nghi Thuy, Cua Lo, Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Nghi Thuỷ, Q. Cửa Lò, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Nghệ An - Cửa Lò - Nghi Thuỷ",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Nghi Thuỷ, Cửa Lò",
+    "expected_province": null,
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "missing province"
+  },
+  {
+    "input": "Cửa Lò, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Cua Lo Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Nghi Thuỷ",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "ward only"
+  },
+  {
+    "input": "Nghii Thuỷ, Cửa Lò, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Ngih Thuỷ, Cửa Lò, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Nghi Thuỷ, Cửửa Lò, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Nghii Thuỷ, Cửửa Lò, Nghe An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Cửửa Lò, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Cửa òL, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Ngh An",
+    "expected_province": "Nghệ An",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Cửa, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "NGHI THUỶ, cửa lò, Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Nghi Thuỷ  ,  Cửa Lò  ,  Nghệ An  ",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Nghi Thuỷ; Cửa Lò; Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": "Nghi Thuỷ",
+    "group": "B",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Cửa Lò Nghệ An",
+    "expected_province": "Nghệ An",
+    "expected_district": "Cửa Lò",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Hòa Hiệp Bắc, Quận Liên Chiểu, Thành phố Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Hoa Hiep Bac, Lien Chieu, Da Nang",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Hòa Hiệp Bắc, Q. Liên Chiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Đà Nẵng - Liên Chiểu - Hòa Hiệp Bắc",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Hòa Hiệp Bắc, Liên Chiểu",
+    "expected_province": null,
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "missing province"
+  },
+  {
+    "input": "Liên Chiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Lien Chieu Da Nang",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Hòa Hiệp Bắc",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "ward only"
+  },
+  {
+    "input": "Hòa Hiệp Bcắ, Liên Chiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Hòa Hiệ Bắc, Liên Chiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Hòa Hiệp Bắc, LLiên Chiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Hòa Hiệp Bcắ, LLiên Chiểu, Da Nang",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "LLiên Chiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Liên hCiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "ĐĐà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Liê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "HÒA HIỆP BẮC, liên chiểu, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Hòa Hiệp Bắc  ,  Liên Chiểu  ,  Đà Nẵng  ",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Hòa Hiệp Bắc; Liên Chiểu; Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": "Hòa Hiệp Bắc",
+    "group": "C",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Liên Chiểu Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Liên Chiểu",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Tam Thuận, Quận Thanh Khê, Thành phố Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Tam Thuan, Thanh Khe, Da Nang",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Tam Thuận, Q. Thanh Khê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Đà Nẵng - Thanh Khê - Tam Thuận",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Tam Thuận, Thanh Khê",
+    "expected_province": null,
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "missing province"
+  },
+  {
+    "input": "Thanh Khê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Thanh Khe Da Nang",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Tam Thuận",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "ward only"
+  },
+  {
+    "input": "tam tuận, Thanh Khê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Tm Thuận, Thanh Khê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Tam Thuận, than khê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "tam tuận, than khê, Da Nang",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "than khê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Thanh KKhê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "ĐĐà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Tha, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "TAM THUẬN, thanh khê, Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Tam Thuận  ,  Thanh Khê  ,  Đà Nẵng  ",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Tam Thuận; Thanh Khê; Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": "Tam Thuận",
+    "group": "D",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Thanh Khê Đà Nẵng",
+    "expected_province": "Đà Nẵng",
+    "expected_district": "Thanh Khê",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Quán Toan, Quận Hồng Bàng, Thành phố Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Quan Toan, Hong Bang, Hai Phong",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Quán Toan, Q. Hồng Bàng, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hải Phòng - Hồng Bàng - Quán Toan",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Quán Toan, Hồng Bàng",
+    "expected_province": null,
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "missing province"
+  },
+  {
+    "input": "Hồng Bàng, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Hong Bang Hai Phong",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Quán Toan",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "ward only"
+  },
+  {
+    "input": "Quán Ton, Hồng Bàng, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "QQuán Toan, Hồng Bàng, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Quán Toan, Hồng Bàg, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Quán Ton, Hồng Bàg, Hai Phong",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Hồng Bàg, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Hồng àng, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Hải Phògn",
+    "expected_province": "Hải Phòng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Hồn, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "QUÁN TOAN, hồng bàng, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Quán Toan  ,  Hồng Bàng  ,  Hải Phòng  ",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Quán Toan; Hồng Bàng; Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": "Quán Toan",
+    "group": "E",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Hồng Bàng Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Hồng Bàng",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Máy Chai, Quận Ngô Quyền, Thành phố Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "full formal address"
+  },
+  {
+    "input": "May Chai, Ngo Quyen, Hai Phong",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Máy Chai, Q. Ngô Quyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Hải Phòng - Ngô Quyền - Máy Chai",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Máy Chai, Ngô Quyền",
+    "expected_province": null,
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "missing province"
+  },
+  {
+    "input": "Ngô Quyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Ngo Quyen Hai Phong",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Máy Chai",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "ward only"
+  },
+  {
+    "input": "My Chai, Ngô Quyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Máy Chaai, Ngô Quyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Máy Chai, Ng Quyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "My Chai, Ng Quyền, Hai Phong",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Ng Quyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Ngô uyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Hải Phògn",
+    "expected_province": "Hải Phòng",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Ngô, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "MÁY CHAI, ngô quyền, Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Máy Chai  ,  Ngô Quyền  ,  Hải Phòng  ",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Máy Chai; Ngô Quyền; Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": "Máy Chai",
+    "group": "F",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Ngô Quyền Hải Phòng",
+    "expected_province": "Hải Phòng",
+    "expected_district": "Ngô Quyền",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Hà Khánh, Quận Hạ Long, Thành phố Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Ha Khanh, Ha Long, Quang Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Hà Khánh, Q. Hạ Long, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Quảng Ninh - Hạ Long - Hà Khánh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Hà Khánh, Hạ Long",
+    "expected_province": null,
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "missing province"
+  },
+  {
+    "input": "Hạ Long, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Ha Long Quang Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Hà Khánh",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "ward only"
+  },
+  {
+    "input": "Hà Khhánh, Hạ Long, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Hà Káhnh, Hạ Long, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Hà Khánh, Hạ Lng, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Hà Khhánh, Hạ Lng, Quang Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Hạ Lng, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Hạạ Long, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Quảng Nihn",
+    "expected_province": "Quảng Ninh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Hạ , Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "HÀ KHÁNH, hạ long, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Hà Khánh  ,  Hạ Long  ,  Quảng Ninh  ",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Hà Khánh; Hạ Long; Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": "Hà Khánh",
+    "group": "G",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Hạ Long Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Hạ Long",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Ka Long, Quận Móng Cái, Thành phố Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Ka Long, Mong Cai, Quang Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Ka Long, Q. Móng Cái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Quảng Ninh - Móng Cái - Ka Long",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Ka Long, Móng Cái",
+    "expected_province": null,
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "missing province"
+  },
+  {
+    "input": "Móng Cái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Mong Cai Quang Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Ka Long",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "ward only"
+  },
+  {
+    "input": "aK Long, Móng Cái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Ka Lng, Móng Cái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Ka Long, Móng ái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "aK Long, Móng ái, Quang Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Móng ái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Móng Cáái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Quảng Nihn",
+    "expected_province": "Quảng Ninh",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Món, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "KA LONG, móng cái, Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Ka Long  ,  Móng Cái  ,  Quảng Ninh  ",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Ka Long; Móng Cái; Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": "Ka Long",
+    "group": "H",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Móng Cái Quảng Ninh",
+    "expected_province": "Quảng Ninh",
+    "expected_district": "Móng Cái",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Quán Triều, Quận Thái Nguyên, Thành phố Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Quan Trieu, Thai Nguyen, Thai Nguyen",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Quán Triều, Q. Thái Nguyên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Thái Nguyên - Thái Nguyên - Quán Triều",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Quán Triều, Thái Nguyên",
+    "expected_province": null,
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "missing province"
+  },
+  {
+    "input": "Thái Nguyên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Thai Nguyen Thai Nguyen",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "I",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "I",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Quán Triều",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "ward only"
+  },
+  {
+    "input": "Qáun Triều, Thái Nguyên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Quán Trều, Thái Nguyên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Quán Triều, Thái Nguên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Qáun Triều, Thái Nguên, Thai Nguyen",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Thái Nguên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "thái nuyên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Thái Nguên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "I",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Thá, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "QUÁN TRIỀU, thái nguyên, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Quán Triều  ,  Thái Nguyên  ,  Thái Nguyên  ",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Quán Triều; Thái Nguyên; Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": "Quán Triều",
+    "group": "I",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Thái Nguyên Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Thái Nguyên",
+    "expected_ward": null,
+    "group": "I",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Lương Sơn, Quận Sông Công, Thành phố Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Luong Son, Song Cong, Thai Nguyen",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Lương Sơn, Q. Sông Công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Thái Nguyên - Sông Công - Lương Sơn",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Lương Sơn, Sông Công",
+    "expected_province": null,
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "missing province"
+  },
+  {
+    "input": "Sông Công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Song Cong Thai Nguyen",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "J",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "J",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Lương Sơn",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "ward only"
+  },
+  {
+    "input": "Lưng Sơn, Sông Công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "ưLơng Sơn, Sông Công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Lương Sơn, Sôg Công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Lưng Sơn, Sôg Công, Thai Nguyen",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Sôg Công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "ôSng Công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Thái Nguên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "J",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Sôn, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "LƯƠNG SƠN, sông công, Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Lương Sơn  ,  Sông Công  ,  Thái Nguyên  ",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Lương Sơn; Sông Công; Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": "Lương Sơn",
+    "group": "J",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Sông Công Thái Nguyên",
+    "expected_province": "Thái Nguyên",
+    "expected_district": "Sông Công",
+    "expected_ward": null,
+    "group": "J",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Nhơn Bình, Quận Quy Nhơn, Thành phố Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Nhon Binh, Quy Nhon, Binh Dinh",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Nhơn Bình, Q. Quy Nhơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Bình Định - Quy Nhơn - Nhơn Bình",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Nhơn Bình, Quy Nhơn",
+    "expected_province": null,
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "missing province"
+  },
+  {
+    "input": "Quy Nhơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Quy Nhon Binh Dinh",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Nhơn Bình",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "ward only"
+  },
+  {
+    "input": "Nơn Bình, Quy Nhơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "nơn bìn, Quy Nhơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Nhơn Bình, Quy hNơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Nơn Bình, Quy hNơn, Binh Dinh",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Quy hNơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "QQuy Nhơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Bnh Định",
+    "expected_province": "Bình Định",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "A",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Quy, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "NHƠN BÌNH, quy nhơn, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Nhơn Bình  ,  Quy Nhơn  ,  Bình Định  ",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Nhơn Bình; Quy Nhơn; Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": "Nhơn Bình",
+    "group": "A",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Quy Nhơn Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "Quy Nhơn",
+    "expected_ward": null,
+    "group": "A",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường An Lão, Quận An Lão, Thành phố Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "full formal address"
+  },
+  {
+    "input": "An Lao, An Lao, Binh Dinh",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. An Lão, Q. An Lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Bình Định - An Lão - An Lão",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "An Lão, An Lão",
+    "expected_province": null,
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "missing province"
+  },
+  {
+    "input": "An Lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district and province only"
+  },
+  {
+    "input": "An Lao Binh Dinh",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "An Lão",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "ward only"
+  },
+  {
+    "input": "A Lão, An Lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Ann Lão, An Lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "An Lão, A Lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "A Lão, A Lão, Binh Dinh",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "A Lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Ann Lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Bnh Định",
+    "expected_province": "Bình Định",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "B",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "An , Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "AN LÃO, an lão, Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  An Lão  ,  An Lão  ,  Bình Định  ",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "An Lão; An Lão; Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": "An Lão",
+    "group": "B",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "An Lão Bình Định",
+    "expected_province": "Bình Định",
+    "expected_district": "An Lão",
+    "expected_ward": null,
+    "group": "B",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường 1, Quận Tuy Hoà, Thành phố Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "full formal address"
+  },
+  {
+    "input": "1, Tuy Hoa, Phu Yen",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. 1, Q. Tuy Hoà, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Phú Yên - Tuy Hoà - 1",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "1, Tuy Hoà",
+    "expected_province": null,
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "missing province"
+  },
+  {
+    "input": "Tuy Hoà, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Tuy Hoa Phu Yen",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "1",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "ward only"
+  },
+  {
+    "input": "1, Tuy Hà, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Tuy Hà, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Tuuy Hoà, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Ph Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "C",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Tuy, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "1, tuy hoà, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  1  ,  Tuy Hoà  ,  Phú Yên  ",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "1; Tuy Hoà; Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": "1",
+    "group": "C",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Tuy Hoà Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Tuy Hoà",
+    "expected_ward": null,
+    "group": "C",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Xuân Phú, Quận Sông Cầu, Thành phố Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Xuan Phu, Song Cau, Phu Yen",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Xuân Phú, Q. Sông Cầu, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Phú Yên - Sông Cầu - Xuân Phú",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Xuân Phú, Sông Cầu",
+    "expected_province": null,
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "missing province"
+  },
+  {
+    "input": "Sông Cầu, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Song Cau Phu Yen",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Xuân Phú",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "ward only"
+  },
+  {
+    "input": "Xuan Phú, Sông Cầu, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "ward with diacritic variation"
+  },
+  {
+    "input": "Xuânn Phú, Sông Cầu, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "suân phú, Sông Cầu, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Xuân Phú, Sông Cuầ, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Xuânn Phú, Sông Cuầ, Phu Yen",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Sông Cuầ, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Sng Cầu, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Ph Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "D",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Sôn, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "XUÂN PHÚ, sông cầu, Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Xuân Phú  ,  Sông Cầu  ,  Phú Yên  ",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Xuân Phú; Sông Cầu; Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": "Xuân Phú",
+    "group": "D",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Sông Cầu Phú Yên",
+    "expected_province": "Phú Yên",
+    "expected_district": "Sông Cầu",
+    "expected_ward": null,
+    "group": "D",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Cái Khế, Quận Ninh Kiều, Thành phố Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Cai Khe, Ninh Kieu, Can Tho",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Cái Khế, Q. Ninh Kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Cần Thơ - Ninh Kiều - Cái Khế",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Cái Khế, Ninh Kiều",
+    "expected_province": null,
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "missing province"
+  },
+  {
+    "input": "Ninh Kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Ninh Kieu Can Tho",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Cái Khế",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "ward only"
+  },
+  {
+    "input": "Cáii Khế, Ninh Kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Ciá Khế, Ninh Kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Cái Khế, nin kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Cáii Khế, nin kiều, Can Tho",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "nin kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Nihn Kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Cần TThơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "E",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Nin, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "CÁI KHẾ, ninh kiều, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Cái Khế  ,  Ninh Kiều  ,  Cần Thơ  ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Cái Khế; Ninh Kiều; Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": "Cái Khế",
+    "group": "E",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Ninh Kiều Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ninh Kiều",
+    "expected_ward": null,
+    "group": "E",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Châu Văn Liêm, Quận Ô Môn, Thành phố Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Chau Van Liem, O Mon, Can Tho",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Châu Văn Liêm, Q. Ô Môn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Cần Thơ - Ô Môn - Châu Văn Liêm",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Châu Văn Liêm, Ô Môn",
+    "expected_province": null,
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "missing province"
+  },
+  {
+    "input": "Ô Môn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district and province only"
+  },
+  {
+    "input": "O Mon Can Tho",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province only"
+  },
+  {
+    "input": "TP Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Châu Văn Liêm",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "ward only"
+  },
+  {
+    "input": "Chau Van Liem, Ô Môn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "ward with diacritic variation"
+  },
+  {
+    "input": "Châu Văn LLiêm, Ô Môn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Châu Văn Lim, Ô Môn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Châu Văn Liêm, Ô ôMn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Châu Văn LLiêm, Ô ôMn, Can Tho",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Ô ôMn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Ô MMôn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Cần TThơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "F",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Ô M, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "CHÂU VĂN LIÊM, ô môn, Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Châu Văn Liêm  ,  Ô Môn  ,  Cần Thơ  ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Châu Văn Liêm; Ô Môn; Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": "Châu Văn Liêm",
+    "group": "F",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Ô Môn Cần Thơ",
+    "expected_province": "Cần Thơ",
+    "expected_district": "Ô Môn",
+    "expected_ward": null,
+    "group": "F",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Chiềng Lề, Quận Sơn La, Thành phố Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Chieng Le, Son La, Son La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Chiềng Lề, Q. Sơn La, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Sơn La - Sơn La - Chiềng Lề",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Chiềng Lề, Sơn La",
+    "expected_province": null,
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "missing province"
+  },
+  {
+    "input": "Sơn La, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Son La Son La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Chiềng Lề",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "ward only"
+  },
+  {
+    "input": "Chiềng ềL, Sơn La, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "hCiềng Lề, Sơn La, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Chiềng Lề, Sơn Laa, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Chiềng ềL, Sơn Laa, Son La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Sơn Laa, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Sơn aL, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Sơn Laa",
+    "expected_province": "Sơn La",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "G",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Sơn, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "CHIỀNG LỀ, sơn la, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Chiềng Lề  ,  Sơn La  ,  Sơn La  ",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Chiềng Lề; Sơn La; Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": "Chiềng Lề",
+    "group": "G",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Sơn La Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Sơn La",
+    "expected_ward": null,
+    "group": "G",
+    "notes": "space delimiter only"
+  },
+  {
+    "input": "Phường Mường Chiên, Quận Quỳnh Nhai, Thành phố Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "full formal address"
+  },
+  {
+    "input": "Muong Chien, Quynh Nhai, Son La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "no accents"
+  },
+  {
+    "input": "P. Mường Chiên, Q. Quỳnh Nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "abbreviated format"
+  },
+  {
+    "input": "Sơn La - Quỳnh Nhai - Mường Chiên",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "reversed order with dashes"
+  },
+  {
+    "input": "Mường Chiên, Quỳnh Nhai",
+    "expected_province": null,
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "missing province"
+  },
+  {
+    "input": "Quỳnh Nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district and province only"
+  },
+  {
+    "input": "Quynh Nhai Son La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "no accents, no comma"
+  },
+  {
+    "input": "Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province only"
+  },
+  {
+    "input": "Tinh Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province with admin prefix"
+  },
+  {
+    "input": "Mường Chiên",
+    "expected_province": null,
+    "expected_district": null,
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "ward only"
+  },
+  {
+    "input": "Mường Chien, Quỳnh Nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "ward with diacritic variation"
+  },
+  {
+    "input": "Mường Chiênn, Quỳnh Nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "ward spelling error 1"
+  },
+  {
+    "input": "Mường hCiên, Quỳnh Nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "ward spelling error 2"
+  },
+  {
+    "input": "Mường Chiên, Qunh Nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "district spelling error"
+  },
+  {
+    "input": "Mường Chiênn, Qunh Nhai, Son La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "multiple spelling errors"
+  },
+  {
+    "input": "Qunh Nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district spelling error 1 (no ward)"
+  },
+  {
+    "input": "Quỳnh Nhia, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district spelling error 2 (no ward)"
+  },
+  {
+    "input": "Sơn Laa",
+    "expected_province": "Sơn La",
+    "expected_district": null,
+    "expected_ward": null,
+    "group": "H",
+    "notes": "province spelling error"
+  },
+  {
+    "input": "Quỳ, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "district abbreviation"
+  },
+  {
+    "input": "MƯỜNG CHIÊN, quỳnh nhai, Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "mixed case"
+  },
+  {
+    "input": "  Mường Chiên  ,  Quỳnh Nhai  ,  Sơn La  ",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "extra spaces"
+  },
+  {
+    "input": "Mường Chiên; Quỳnh Nhai; Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": "Mường Chiên",
+    "group": "H",
+    "notes": "semicolon delimiters"
+  },
+  {
+    "input": "Quỳnh Nhai Sơn La",
+    "expected_province": "Sơn La",
+    "expected_district": "Quỳnh Nhai",
+    "expected_ward": null,
+    "group": "H",
+    "notes": "space delimiter only"
+  }
+]
