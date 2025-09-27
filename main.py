@@ -72,7 +72,7 @@ class Trie:
 class AddressClassifier:
     """
     Vietnam address classifier combining best features from both algorithms:
-    - Trie for prefix matching (from vietnam-address-classifier.py)
+    - Trie for prefix matching
     - Hash tables for O(1) exact lookups
     - Simplified fuzzy matching with Levenshtein distance
     - Better text normalization and preprocessing
@@ -106,8 +106,10 @@ class AddressClassifier:
 
         # Common Vietnamese address patterns and abbreviations
         self.address_patterns = {
-            "province_prefixes": [r"\b(thành phố|thnh phố|tp\.?|tỉnh|tnh|t\.?)\s*"],
-            "district_prefixes": [r"\b(quận|qun|q\.?|huyện|huyn|h\.?|thị xã|tx\.?)\s*"],
+            "province_prefixes": [r"\b(tỉnh|tnh|t\.)\s*"],
+            "district_prefixes": [
+                r"\b(quận|qun|q\.?|huyện|huyn|h\s|h\.|thị xã|tx\.?|thành phố|thnh phố|tp\.?)\s*"
+            ],
             "ward_prefixes": [r"\b(phường|phng|p\.?|xã|x\.?|thị trần|tt\.?)\s*"],
         }
 
@@ -164,13 +166,17 @@ class AddressClassifier:
         return cleaned
 
     def _generate_ngrams(self, text: str, n: int = 2) -> List[str]:
-        """Generate n-grams for fuzzy matching"""
+        """Generate n-grams for fuzzy matching - now includes 1-grams"""
         if len(text) < n:
-            return [text]
-        return [text[i : i + n] for i in range(len(text) - n + 1)]
+            return list(text)  # Return individual characters
+        ngrams = [text[i : i + n] for i in range(len(text) - n + 1)]
+        # Also add individual characters for better typo tolerance
+        if n > 1:
+            ngrams.extend(list(text))
+        return ngrams
 
     def _build_data_structures(self):
-        """Build all data structures efficiently"""
+        """Build all data structures with better n-gram indexing"""
         print("Building data structures...")
 
         # Build province structures
@@ -181,11 +187,10 @@ class AddressClassifier:
                 self.province_hash[variant] = province
                 # Trie
                 self.province_trie.insert(variant, province)
-                # N-grams
-                if len(variant) >= 2:
-                    ngrams = self._generate_ngrams(variant)
-                    for ngram in ngrams:
-                        self.province_ngrams[ngram].add(province)
+                # N-grams - now includes 1-grams for typo tolerance
+                ngrams = self._generate_ngrams(variant, 2)
+                for ngram in ngrams:
+                    self.province_ngrams[ngram].add(province)
 
         # Build district structures
         for district in self.districts:
@@ -193,10 +198,9 @@ class AddressClassifier:
             for variant in variants:
                 self.district_hash[variant] = district
                 self.district_trie.insert(variant, district)
-                if len(variant) >= 2:
-                    ngrams = self._generate_ngrams(variant)
-                    for ngram in ngrams:
-                        self.district_ngrams[ngram].add(district)
+                ngrams = self._generate_ngrams(variant, 2)
+                for ngram in ngrams:
+                    self.district_ngrams[ngram].add(district)
 
         # Build ward structures
         for ward in self.wards:
@@ -204,10 +208,9 @@ class AddressClassifier:
             for variant in variants:
                 self.ward_hash[variant] = ward
                 self.ward_trie.insert(variant, ward)
-                if len(variant) >= 2:
-                    ngrams = self._generate_ngrams(variant)
-                    for ngram in ngrams:
-                        self.ward_ngrams[ngram].add(ward)
+                ngrams = self._generate_ngrams(variant, 2)
+                for ngram in ngrams:
+                    self.ward_ngrams[ngram].add(ward)
 
         print("Data structures built successfully!")
 
@@ -249,11 +252,6 @@ class AddressClassifier:
         if len2 == 0:
             return len1
 
-        # Early termination for very different lengths
-        if abs(len1 - len2) > max(len1, len2) * 0.5:
-            self.edit_distance_cache[key] = float("inf")
-            return float("inf")
-
         # Use only two rows for space optimization
         prev_row = list(range(len2 + 1))
         curr_row = [0] * (len2 + 1)
@@ -282,7 +280,7 @@ class AddressClassifier:
         threshold: float = 0.7,
     ) -> Optional[str]:
         """
-        Multi-algorithm fuzzy matching with performance optimizations
+        Improved fuzzy matching with better candidate selection
         """
         if not query:
             return None
@@ -298,19 +296,42 @@ class AddressClassifier:
         if trie_matches:
             return trie_matches[0]
 
-        # Algorithm 3: N-gram + Levenshtein scoring (most accurate)
+        # Algorithm 3: IMPROVED - Direct Levenshtein for small errors
+        # For queries with likely typos (1-2 char errors), check ALL candidates
         candidates = set()
 
-        # Collect candidates from n-grams
+        # Collect candidates more aggressively
         if len(query_norm) >= 2:
-            query_ngrams = set(self._generate_ngrams(query_norm))
+            # Use single character n-grams for better typo tolerance
+            for i in range(len(query_norm)):
+                char = query_norm[i]
+                if char in ngram_table:
+                    candidates.update(ngram_table[char])
+
+            # Also use 2-grams
+            query_ngrams = set(self._generate_ngrams(query_norm, 2))
             for ngram in query_ngrams:
                 if ngram in ngram_table:
                     candidates.update(ngram_table[ngram])
 
-        # Limit candidates to prevent performance issues
-        if len(candidates) > 50:
-            candidates = list(candidates)[:50]
+        # For short queries, also check by first few characters
+        if len(query_norm) >= 3:
+            prefix_key = query_norm[:3]
+            for key in hash_table:
+                if key.startswith(prefix_key):
+                    candidates.add(hash_table[key])
+
+        # Dynamic candidate limit based on query length
+        max_candidates = min(100, len(query_norm) * 10)
+        if len(candidates) > max_candidates:
+            # Prioritize candidates with similar length
+            candidates = sorted(
+                candidates,
+                key=lambda x: abs(
+                    len(self._normalize_vietnamese_text(x)) - len(query_norm)
+                ),
+            )
+            candidates = candidates[:max_candidates]
 
         # Score candidates using Levenshtein distance
         best_match = None
@@ -318,11 +339,21 @@ class AddressClassifier:
 
         for candidate in candidates:
             candidate_norm = self._normalize_vietnamese_text(candidate)
+
+            # Quick length check - skip if too different
+            if abs(len(candidate_norm) - len(query_norm)) > 3:
+                continue
+
             distance = self._levenshtein_distance(query_norm, candidate_norm)
             max_len = max(len(query_norm), len(candidate_norm))
 
             if max_len > 0:
                 similarity = 1.0 - (distance / max_len)
+
+                # Bonus for exact prefix match
+                if candidate_norm.startswith(query_norm[: min(3, len(query_norm))]):
+                    similarity += 0.1
+
                 if similarity > best_score and similarity >= threshold:
                     best_score = similarity
                     best_match = candidate
@@ -334,6 +365,7 @@ class AddressClassifier:
     ) -> Tuple[List[str], List[str], List[str]]:
         """
         Intelligent address component extraction using regex and context
+        Now handles ambiguous names that appear in multiple administrative levels
         """
         if not address:
             return [], [], []
@@ -349,7 +381,7 @@ class AddressClassifier:
         potential_districts = []
         potential_wards = []
 
-        for part in parts:
+        for i, part in enumerate(parts):
             original_part = part
             part_lower = part.lower()
 
@@ -367,21 +399,29 @@ class AddressClassifier:
                 for prefix in self.address_patterns["ward_prefixes"]
             )
 
-            # Remove prefixes
+            # Remove prefixes more carefully - only remove the specific prefix that was detected
             cleaned_part = original_part
-            all_prefixes = (
-                self.address_patterns["province_prefixes"]
-                + self.address_patterns["district_prefixes"]
-                + self.address_patterns["ward_prefixes"]
-            )
-            for prefix in all_prefixes:
-                cleaned_part = re.sub(prefix, "", cleaned_part, flags=re.IGNORECASE)
+            if has_province_prefix:
+                for prefix in self.address_patterns["province_prefixes"]:
+                    cleaned_part = re.sub(
+                        "^" + prefix, "", cleaned_part, flags=re.IGNORECASE
+                    )
+            elif has_district_prefix:
+                for prefix in self.address_patterns["district_prefixes"]:
+                    cleaned_part = re.sub(
+                        "^" + prefix, "", cleaned_part, flags=re.IGNORECASE
+                    )
+            elif has_ward_prefix:
+                for prefix in self.address_patterns["ward_prefixes"]:
+                    cleaned_part = re.sub(
+                        "^" + prefix, "", cleaned_part, flags=re.IGNORECASE
+                    )
 
             cleaned_part = cleaned_part.strip()
             if not cleaned_part:
                 continue
 
-            # Categorize based on prefixes and context
+            # Smart categorization based on prefixes, position, and context
             if has_province_prefix or self._is_major_city(cleaned_part):
                 potential_provinces.append(cleaned_part)
             elif has_district_prefix:
@@ -389,12 +429,162 @@ class AddressClassifier:
             elif has_ward_prefix:
                 potential_wards.append(cleaned_part)
             else:
-                # Add to all categories if no clear prefix
-                potential_provinces.append(cleaned_part)
-                potential_districts.append(cleaned_part)
-                potential_wards.append(cleaned_part)
+                # For ambiguous components, use context-aware categorization
+                self._categorize_ambiguous_component(
+                    cleaned_part,
+                    i,
+                    len(parts),
+                    potential_provinces,
+                    potential_districts,
+                    potential_wards,
+                )
+
+            # Special handling for "thành phố" - can be both province and district
+            if has_district_prefix and any(
+                prefix in part_lower for prefix in ["thành phố", "thnh phố", "tp"]
+            ):
+                # Check if this thành phố exists as a province (major cities)
+                if self._is_major_city(cleaned_part):
+                    potential_provinces.append(cleaned_part)
 
         return potential_provinces, potential_districts, potential_wards
+
+    def _categorize_ambiguous_component(
+        self,
+        component: str,
+        position: int,
+        total_parts: int,
+        potential_provinces: List[str],
+        potential_districts: List[str],
+        potential_wards: List[str],
+    ):
+        """
+        Categorize components that could belong to multiple administrative levels
+        Uses position, context, and actual data presence to make smart decisions
+        """
+        # Check which administrative levels this component actually exists in
+        exists_in_provinces = self._component_exists_in_level(component, "province")
+        exists_in_districts = self._component_exists_in_level(component, "district")
+        exists_in_wards = self._component_exists_in_level(component, "ward")
+
+        # Position-based hints (Vietnamese addresses typically go: ward, district, province)
+        is_likely_ward = position == 0  # First part is usually ward
+        is_likely_district = position == 1 or (
+            position == 0 and total_parts == 2
+        )  # Second part or only part
+        is_likely_province = (
+            position == total_parts - 1
+        )  # Last part is usually province
+
+        # Special case: If component exists in both districts and wards,
+        # use more sophisticated context analysis
+        if exists_in_districts and exists_in_wards and not exists_in_provinces:
+            # Check surrounding context for hints
+            if self._has_district_context_hints(component, position, total_parts):
+                potential_districts.append(component)
+            elif self._has_ward_context_hints(component, position, total_parts):
+                potential_wards.append(component)
+            else:
+                # Default to position-based categorization
+                if is_likely_district:
+                    potential_districts.append(component)
+                elif is_likely_ward:
+                    potential_wards.append(component)
+                else:
+                    # Add to both and let confidence scoring decide
+                    potential_districts.append(component)
+                    potential_wards.append(component)
+            return
+
+        # Add to categories based on existence and position
+        if exists_in_provinces and (
+            is_likely_province or not exists_in_districts and not exists_in_wards
+        ):
+            potential_provinces.append(component)
+
+        if exists_in_districts and (
+            is_likely_district or not exists_in_provinces and not exists_in_wards
+        ):
+            potential_districts.append(component)
+
+        if exists_in_wards and (
+            is_likely_ward or not exists_in_provinces and not exists_in_districts
+        ):
+            potential_wards.append(component)
+
+        # If component exists in multiple levels and position is unclear, add to all relevant levels
+        # but with lower priority (will be handled by confidence scoring later)
+        if exists_in_provinces and exists_in_districts and exists_in_wards:
+            # Add to the most likely category based on position
+            if is_likely_province:
+                potential_provinces.append(component)
+            elif is_likely_district:
+                potential_districts.append(component)
+            elif is_likely_ward:
+                potential_wards.append(component)
+            else:
+                # Default fallback - add to all but let confidence scoring decide
+                potential_provinces.append(component)
+                potential_districts.append(component)
+                potential_wards.append(component)
+        elif exists_in_provinces and exists_in_districts:
+            if is_likely_province:
+                potential_provinces.append(component)
+            elif is_likely_district:
+                potential_districts.append(component)
+            else:
+                potential_provinces.append(component)
+                potential_districts.append(component)
+        elif exists_in_provinces and exists_in_wards:
+            if is_likely_province:
+                potential_provinces.append(component)
+            elif is_likely_ward:
+                potential_wards.append(component)
+            else:
+                potential_provinces.append(component)
+                potential_wards.append(component)
+
+    def _has_district_context_hints(
+        self, component: str, position: int, total_parts: int
+    ) -> bool:
+        """Check if context suggests this component should be a district"""
+        # If it's in the middle position of a 3-part address, likely district
+        if total_parts == 3 and position == 1:
+            return True
+
+        # If it's the only component in a 2-part address, likely district
+        if total_parts == 2 and position == 0:
+            return True
+
+        # If it's the second-to-last component, likely district
+        if position == total_parts - 2:
+            return True
+
+        return False
+
+    def _has_ward_context_hints(
+        self, component: str, position: int, total_parts: int
+    ) -> bool:
+        """Check if context suggests this component should be a ward"""
+        # If it's the first component, likely ward
+        if position == 0:
+            return True
+
+        # If it's followed by a district-like component, likely ward
+        # (This would need more context analysis in a real implementation)
+        return False
+
+    def _component_exists_in_level(self, component: str, level: str) -> bool:
+        """Check if a component exists in a specific administrative level"""
+        if level == "province":
+            hash_table = self.province_hash
+        elif level == "district":
+            hash_table = self.district_hash
+        else:  # ward
+            hash_table = self.ward_hash
+
+        normalized = self._normalize_vietnamese_text(component)
+        return normalized in hash_table
 
     def _is_major_city(self, text: str) -> bool:
         """Check if text contains major Vietnamese cities"""
@@ -434,42 +624,92 @@ class AddressClassifier:
     def _find_best_match(
         self, candidates: List[str], component_type: str
     ) -> Optional[str]:
-        """Find the best match for a given component type"""
+        """Find the best match with adjusted thresholds"""
         if not candidates:
             return None
 
-        # Select appropriate data structures based on component type
+        # Lower thresholds to handle more spelling errors
         if component_type == "province":
             hash_table, trie, ngram_table = (
                 self.province_hash,
                 self.province_trie,
                 self.province_ngrams,
             )
-            threshold = 0.75
+            threshold = 0.65  # Lowered from 0.75
         elif component_type == "district":
             hash_table, trie, ngram_table = (
                 self.district_hash,
                 self.district_trie,
                 self.district_ngrams,
             )
-            threshold = 0.70
+            threshold = 0.60  # Lowered from 0.70
         else:  # ward
             hash_table, trie, ngram_table = (
                 self.ward_hash,
                 self.ward_trie,
                 self.ward_ngrams,
             )
-            threshold = 0.80
+            threshold = 0.65  # Lowered from 0.80
 
-        # Try each candidate
+        # Score all candidates and return the best one
+        best_match = None
+        best_confidence = 0.0
+
         for candidate in candidates:
             match = self._fuzzy_match(
                 candidate, hash_table, trie, ngram_table, threshold
             )
             if match:
-                return match
+                # Calculate confidence score based on match quality and context
+                confidence = self._calculate_match_confidence(
+                    candidate, match, component_type, hash_table
+                )
+                if confidence > best_confidence:
+                    best_confidence = confidence
+                    best_match = match
 
-        return None
+        return best_match
+
+    def _calculate_match_confidence(
+        self, candidate: str, match: str, component_type: str, hash_table: dict
+    ) -> float:
+        """Calculate confidence score for a match"""
+        base_confidence = 1.0
+
+        # Exact match gets highest confidence
+        normalized_candidate = self._normalize_vietnamese_text(candidate)
+        if normalized_candidate in hash_table:
+            return base_confidence
+
+        # Trie match gets high confidence
+        if component_type == "province":
+            trie_matches = self.province_trie.search_prefix(
+                normalized_candidate, max_results=1
+            )
+        elif component_type == "district":
+            trie_matches = self.district_trie.search_prefix(
+                normalized_candidate, max_results=1
+            )
+        else:
+            trie_matches = self.ward_trie.search_prefix(
+                normalized_candidate, max_results=1
+            )
+
+        if trie_matches and match in trie_matches:
+            return base_confidence * 0.9
+
+        # Fuzzy match gets lower confidence based on similarity
+        distance = self._levenshtein_distance(
+            normalized_candidate, self._normalize_vietnamese_text(match)
+        )
+        max_len = max(
+            len(normalized_candidate), len(self._normalize_vietnamese_text(match))
+        )
+        if max_len > 0:
+            similarity = 1.0 - (distance / max_len)
+            return base_confidence * similarity
+
+        return base_confidence * 0.5  # Default confidence for any match
 
 
 def load_txt_with_encoding(file_path: str) -> List[str]:

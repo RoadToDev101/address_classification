@@ -49,7 +49,7 @@ Quảng Hòa
 Hoà An
 Nguyên Bình
 Thạch An
-Thành Phố Bắc Kạn
+Bắc Kạn
 Pác Nặm
 Ba Bể
 Ngân Sơn
@@ -74,7 +74,7 @@ Bảo Yên
 Sa Pa
 Văn Bàn
 Điện Biên Phủ
-Thị Xã Mường Lay
+Mường Lay
 Mường Nhé
 Mường Chà
 Tủa Chùa
@@ -311,7 +311,6 @@ Thanh Chương
 Nghi Lộc
 Nam Đàn
 Hưng Nguyên
-Hoàng Mai
 Hà Tĩnh
 Hồng Lĩnh
 Hương Sơn
@@ -324,8 +323,7 @@ Thạch Hà
 Cẩm Xuyên
 Kỳ Anh
 Lộc Hà
-Kỳ Anh
-Thành Phố Đồng Hới
+Đồng Hới
 Minh Hóa
 Tuyên Hóa
 Quảng Trạch
@@ -384,7 +382,6 @@ Trà Bồng
 Sơn Tịnh
 Tư Nghĩa
 Sơn Hà
-Sơn Tây
 Minh Long
 Nghĩa Hành
 Mộ Đức
@@ -464,7 +461,7 @@ Krông Pa
 Phú Thiện
 Chư Pưh
 Buôn Ma Thuột
-Thị Xã Buôn Hồ
+Buôn Hồ
 Ea H'leo
 Ea Súp
 Buôn Đôn
@@ -522,7 +519,6 @@ Bàu Bàng
 Dầu Tiếng
 Bến Cát
 Phú Giáo
-Tân Uyên
 Dĩ An
 Thuận An
 Bắc Tân Uyên
@@ -550,7 +546,6 @@ Côn Đảo
 Gò Vấp
 Bình Thạnh
 Tân Bình
-Tân Phú
 Phú Nhuận
 Thủ Đức
 3
@@ -586,7 +581,6 @@ Gò Công
 Cai Lậy
 Tân Phước
 Cái Bè
-Cai Lậy
 Chợ Gạo
 Gò Công Tây
 Gò Công Đông
@@ -606,7 +600,6 @@ Tiểu Cần
 Cầu Ngang
 Trà Cú
 Duyên Hải
-Duyên Hải
 Vĩnh Long
 Long Hồ
 Mang Thít
@@ -614,21 +607,17 @@ Vũng Liêm
 Tam Bình
 Bình Minh
 Trà Ôn
-Bình Tân
 Cao Lãnh
 Sa Đéc
 Hồng Ngự
 Tân Hồng
-Hồng Ngự
 Tháp Mười
-Cao Lãnh
 Thanh Bình
 Lấp Vò
 Lai Vung
 Long Xuyên
 Châu Đốc
 An Phú
-Tân Châu
 Phú Tân
 Châu Phú
 Tịnh Biên
@@ -661,7 +650,6 @@ Châu Thành A
 Phụng Hiệp
 Vị Thuỷ
 Long Mỹ
-Long Mỹ
 Sóc Trăng
 Kế Sách
 Mỹ Tú
@@ -674,7 +662,6 @@ Vĩnh Châu
 Trần Đề
 Bạc Liêu
 Hồng Dân
-Phước Long
 Vĩnh Lợi
 Giá Rai
 Đông Hải
