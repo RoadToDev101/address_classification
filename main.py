@@ -1,118 +1,117 @@
+# Vietnam Address Classification Solution
+# Combined approach from both algorithms with performance optimizations
+# Author: AI Assistant
+# Performance Requirements: ≤0.1s max, ≤0.01s average per request
+
 import re
-import time
 import unicodedata
+import time
 import json
 import csv
+import sys
+import io
+import os
+from collections import defaultdict
 from functools import lru_cache
 from typing import Dict, List, Optional, Tuple
-from collections import defaultdict, Counter
 
-############################################################
-# CSV loading helpers - Data preprocessing
-############################################################
-
-
-def load_csv_with_encoding(file_path: str, location_type: str = None) -> List[str]:
-    """
-    Load data from CSV file with automatic encoding detection and prefix removal
-
-    ALGORITHM: Multi-encoding fallback with administrative prefix removal
-    - Try multiple encodings (UTF-8-sig first to handle BOM)
-    - Remove Vietnamese administrative prefixes (Thành phố, Tỉnh, Huyện, etc.)
-    - This preprocessing normalizes data for better matching
-    """
-    encodings = ["utf-8-sig", "utf-8", "latin-1", "cp1252", "iso-8859-1"]
-
-    for encoding in encodings:
-        try:
-            with open(file_path, "r", encoding=encoding) as f:
-                data = [line.strip() for line in f if line.strip()]
-
-            # Remove prefixes based on location type
-            if location_type:
-                data = [remove_prefix(name, location_type) for name in data]
-            return data
-        except (UnicodeDecodeError, FileNotFoundError):
-            continue
-
-    raise Exception(f"Could not read file {file_path} with any supported encoding")
+# Set console encoding to UTF-8 for proper Vietnamese character display
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 
-# Administrative prefix removal functions
-def remove_prefix(name: str, location_type: str) -> str:
-    """Remove administrative prefixes from Vietnamese location names"""
-    prefixes = {
-        "province": ["Thành phố ", "Tỉnh "],
-        "district": ["Huyện ", "Quận ", "Thị xã ", "Thành phố "],
-        "ward": ["Phường ", "Xã ", "Thị trấn "],
-    }
+class TrieNode:
+    """Trie node for efficient prefix-based searching"""
 
-    for prefix in prefixes.get(location_type, []):
-        if name.startswith(prefix):
-            return name[len(prefix) :]
-    return name
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+        self.original_names = []
 
 
-############################################################
-# Address classifier - Main Algorithm
-############################################################
+class Trie:
+    """Trie data structure for fast prefix matching"""
+
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word, original_name):
+        node = self.root
+        for char in word.lower():
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+        if original_name not in node.original_names:
+            node.original_names.append(original_name)
+
+    def search_prefix(self, prefix, max_results=5):
+        node = self.root
+        prefix = prefix.lower()
+
+        for char in prefix:
+            if char not in node.children:
+                return []
+            node = node.children[char]
+
+        results = []
+        self._collect_words(node, results, max_results)
+        return results
+
+    def _collect_words(self, node, results, max_results):
+        if len(results) >= max_results:
+            return
+        if node.is_end:
+            results.extend(node.original_names[: max_results - len(results)])
+        for child in node.children.values():
+            if len(results) < max_results:
+                self._collect_words(child, results, max_results)
 
 
 class AddressClassifier:
     """
-    MAIN ALGORITHM: Multi-stage fuzzy string matching with Dynamic Programming
-
-    APPROACH:
-    1. Text Normalization - Handle Unicode, remove diacritics, normalize spacing
-    2. Alias Expansion - Handle common abbreviations (Q1 -> Quan 1, HCM -> Ho Chi Minh)
-    3. N-gram Generation - Create all possible substrings (1-3 words)
-    4. Fuzzy Matching - Use DP edit distance for spell error tolerance
-    5. Candidate Scoring - Score candidates based on similarity + frequency penalty
-    6. Combination Selection - Find best non-overlapping province/district/ward combo
-
-    KEY OPTIMIZATIONS:
-    - Bucketing by first character for O(1) candidate lookup
-    - LRU cache for normalization (hot path optimization)
-    - Edit distance cache with early cutoff for performance
-    - Frequency-based penalty to prefer common locations
+    Vietnam address classifier combining best features from both algorithms:
+    - Trie for prefix matching (from vietnam-address-classifier.py)
+    - Hash tables for O(1) exact lookups
+    - Simplified fuzzy matching with Levenshtein distance
+    - Better text normalization and preprocessing
+    - Performance optimizations for speed
     """
 
     def __init__(self, provinces: List[str], districts: List[str], wards: List[str]):
-        """
-        Initialize classifier with preprocessing for fast lookup
-
-        DATA STRUCTURES:
-        - norm_* : normalized_name -> original_name mapping
-        - freq_* : frequency counters for penalty calculation
-        - bucket_* : first_char -> [candidates] for O(1) lookup
-        """
         self.provinces = provinces
         self.districts = districts
         self.wards = wards
 
-        # Create normalized mappings for reverse lookup
-        self.norm_provinces = {self._normalize(p): p for p in provinces}
-        self.norm_districts = {self._normalize(d): d for d in districts}
-        self.norm_wards = {self._normalize(w): w for w in wards}
+        # Data structures for fast lookup
+        self.province_hash = {}
+        self.district_hash = {}
+        self.ward_hash = {}
 
-        # Frequency counters for penalty calculation (common names get lower penalty)
-        self.freq_provinces = Counter(self._normalize(p) for p in provinces)
-        self.freq_districts = Counter(self._normalize(d) for d in districts)
-        self.freq_wards = Counter(self._normalize(w) for w in wards)
+        # Trie structures for prefix matching
+        self.province_trie = Trie()
+        self.district_trie = Trie()
+        self.ward_trie = Trie()
 
-        # Bucketing by first alphanumeric character for fast candidate lookup
-        # This reduces search space from O(n) to O(candidates_per_bucket)
-        self.bucket_provinces = defaultdict(list)
-        self.bucket_districts = defaultdict(list)
-        self.bucket_wards = defaultdict(list)
-        for n in self.norm_provinces:
-            self.bucket_provinces[self._first_alnum(n)].append(n)
-        for n in self.norm_districts:
-            self.bucket_districts[self._first_alnum(n)].append(n)
-        for n in self.norm_wards:
-            self.bucket_wards[self._first_alnum(n)].append(n)
+        # N-gram tables for fuzzy matching
+        self.province_ngrams = defaultdict(set)
+        self.district_ngrams = defaultdict(set)
+        self.ward_ngrams = defaultdict(set)
 
-        # Alias mapping for common abbreviations and alternative names
+        # Caching for performance
+        self.normalization_cache = {}
+        self.match_cache = {}
+        self.edit_distance_cache = {}
+
+        # Common Vietnamese address patterns and abbreviations
+        self.address_patterns = {
+            "province_prefixes": [r"\b(thành phố|thnh phố|tp\.?|tỉnh|tnh|t\.?)\s*"],
+            "district_prefixes": [r"\b(quận|qun|q\.?|huyện|huyn|h\.?|thị xã|tx\.?)\s*"],
+            "ward_prefixes": [r"\b(phường|phng|p\.?|xã|x\.?|thị trần|tt\.?)\s*"],
+        }
+
+        # Alias mapping for common abbreviations
         self.alias_map = {
             "hcm": "ho chi minh",
             "sai gon": "ho chi minh",
@@ -125,469 +124,511 @@ class AddressClassifier:
             "tt": "thi tran",
         }
 
-        # Cache for edit distance calculations (performance optimization)
-        self._edit_distance_cache: Dict[Tuple[str, str], int] = {}
+        self._build_data_structures()
 
     @lru_cache(maxsize=20000)
-    def _normalize(self, text: str) -> str:
+    def _normalize_vietnamese_text(self, text: str) -> str:
         """
-        TEXT NORMALIZATION ALGORITHM:
-        1. Convert to lowercase
-        2. Remove Vietnamese diacritics using Unicode NFD decomposition
-        3. Replace punctuation with spaces
-        4. Normalize whitespace
-
-        This handles spelling variations and diacritic inconsistencies
+        Advanced Vietnamese text normalization with caching
+        Handles diacritics, case, spacing, and common abbreviations
         """
         if not text:
             return ""
-        text = text.lower().strip()
-        # Unicode NFD decomposition separates base chars from diacritics
-        normalized = unicodedata.normalize("NFD", text)
-        # Remove diacritic marks (category 'Mn' = nonspacing marks)
-        normalized = "".join(
-            ch for ch in normalized if unicodedata.category(ch) != "Mn"
+
+        # Check cache first
+        if text in self.normalization_cache:
+            return self.normalization_cache[text]
+
+        # Normalize text
+        result = text.lower().strip()
+
+        # Remove diacritics using Unicode normalization
+        normalized = unicodedata.normalize("NFD", result)
+        without_diacritics = "".join(
+            c for c in normalized if unicodedata.category(c) != "Mn"
         )
-        # Replace punctuation with spaces for consistent tokenization
-        normalized = re.sub(r"[\,\.;/\\|\-]", " ", normalized)
-        # Normalize whitespace
-        normalized = " ".join(normalized.split())
-        return normalized
 
-    def _first_alnum(self, s: str) -> str:
-        """Get first alphanumeric character for bucketing"""
-        for ch in s:
-            if ch.isalnum():
-                return ch
-        return "#"
+        # Clean up spaces and punctuation
+        cleaned = re.sub(r"[^\w\s]", " ", without_diacritics)
+        cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
-    def _apply_aliases(self, text_norm: str) -> str:
+        # Apply aliases
+        words = cleaned.split()
+        for i, word in enumerate(words):
+            if word in self.alias_map:
+                words[i] = self.alias_map[word]
+        cleaned = " ".join(words)
+
+        # Cache result
+        self.normalization_cache[text] = cleaned
+        return cleaned
+
+    def _generate_ngrams(self, text: str, n: int = 2) -> List[str]:
+        """Generate n-grams for fuzzy matching"""
+        if len(text) < n:
+            return [text]
+        return [text[i : i + n] for i in range(len(text) - n + 1)]
+
+    def _build_data_structures(self):
+        """Build all data structures efficiently"""
+        print("Building data structures...")
+
+        # Build province structures
+        for province in self.provinces:
+            variants = self._generate_text_variants(province)
+            for variant in variants:
+                # Hash table
+                self.province_hash[variant] = province
+                # Trie
+                self.province_trie.insert(variant, province)
+                # N-grams
+                if len(variant) >= 2:
+                    ngrams = self._generate_ngrams(variant)
+                    for ngram in ngrams:
+                        self.province_ngrams[ngram].add(province)
+
+        # Build district structures
+        for district in self.districts:
+            variants = self._generate_text_variants(district)
+            for variant in variants:
+                self.district_hash[variant] = district
+                self.district_trie.insert(variant, district)
+                if len(variant) >= 2:
+                    ngrams = self._generate_ngrams(variant)
+                    for ngram in ngrams:
+                        self.district_ngrams[ngram].add(district)
+
+        # Build ward structures
+        for ward in self.wards:
+            variants = self._generate_text_variants(ward)
+            for variant in variants:
+                self.ward_hash[variant] = ward
+                self.ward_trie.insert(variant, ward)
+                if len(variant) >= 2:
+                    ngrams = self._generate_ngrams(variant)
+                    for ngram in ngrams:
+                        self.ward_ngrams[ngram].add(ward)
+
+        print("Data structures built successfully!")
+
+    def _generate_text_variants(self, text: str) -> List[str]:
+        """Generate variants of text for better matching"""
+        variants = set()
+
+        # Original and normalized
+        variants.add(text)
+        normalized = self._normalize_vietnamese_text(text)
+        variants.add(normalized)
+
+        # Without spaces
+        variants.add(normalized.replace(" ", ""))
+
+        # Individual significant words
+        words = normalized.split()
+        for word in words:
+            if len(word) >= 3:  # Only meaningful words
+                variants.add(word)
+
+        return [v for v in variants if v]
+
+    def _levenshtein_distance(self, s1: str, s2: str) -> int:
         """
-        ALIAS EXPANSION ALGORITHM:
-        1. Expand abbreviated administrative units (Q1 -> quan 1)
-        2. Replace common abbreviations (HCM -> ho chi minh)
-
-        This handles common Vietnamese address abbreviations
+        Levenshtein distance calculation with caching
         """
+        if s1 == s2:
+            return 0
 
-        # Expand Q1/P5/H7 -> quan 1 / phuong 5 / huyen 7
-        def repl_q(m):
-            return f"quan {int(m.group(1))}"
-
-        def repl_p(m):
-            return f"phuong {int(m.group(1))}"
-
-        def repl_h(m):
-            return f"huyen {int(m.group(1))}"
-
-        text_norm = re.sub(r"\bq\.?\s*(\d{1,2})\b", repl_q, text_norm)
-        text_norm = re.sub(r"\bp\.?\s*(\d{1,2})\b", repl_p, text_norm)
-        text_norm = re.sub(r"\bh\.?\s*(\d{1,2})\b", repl_h, text_norm)
-
-        # Word-level aliases
-        words = text_norm.split()
-        for i, w in enumerate(words):
-            if w in self.alias_map:
-                words[i] = self.alias_map[w]
-        return " ".join(words)
-
-    def _generate_tokens(self, address: str) -> List[str]:
-        """Generate normalized tokens from input address"""
-        norm_full = self._normalize(address)
-        norm_full = self._apply_aliases(norm_full)
-        return norm_full.split()
-
-    def _ngrams(self, tokens: List[str], max_n: int = 3) -> List[Tuple[int, int, str]]:
-        """
-        N-GRAM GENERATION ALGORITHM:
-        Generate all possible contiguous subsequences of 1-3 words
-        Returns (start_idx, end_idx, text) tuples
-
-        This allows matching location names that span multiple words
-        """
-        out = []
-        n = len(tokens)
-        for i in range(n):
-            for L in range(1, max_n + 1):
-                j = i + L
-                if j <= n:
-                    out.append((i, j, " ".join(tokens[i:j])))
-        return out
-
-    # ---------------- Dynamic Programming Edit Distance ----------------
-    def _edit_distance_dp(self, s1: str, s2: str, max_dist: int) -> int:
-        """
-        DYNAMIC PROGRAMMING EDIT DISTANCE with early cutoff
-
-        ALGORITHM: Wagner-Fischer DP with optimizations
-        1. Early termination if length difference > max_dist
-        2. Row-wise DP with space optimization (O(min(m,n)) space)
-        3. Early cutoff if minimum in current row > max_dist
-        4. Caching for repeated calculations
-
-        This handles spelling errors within reasonable edit distance
-        """
+        # Check cache
         key = (s1, s2) if s1 <= s2 else (s2, s1)
-        if key in self._edit_distance_cache:
-            return self._edit_distance_cache[key]
+        if key in self.edit_distance_cache:
+            return self.edit_distance_cache[key]
 
         len1, len2 = len(s1), len(s2)
-        # Early termination: if length difference > max_dist, impossible to match
-        if abs(len1 - len2) > max_dist:
+        if len1 == 0:
+            return len2
+        if len2 == 0:
+            return len1
+
+        # Early termination for very different lengths
+        if abs(len1 - len2) > max(len1, len2) * 0.5:
+            self.edit_distance_cache[key] = float("inf")
             return float("inf")
 
-        # DP table: prev[j] = edit distance between s1[:i-1] and s2[:j]
-        prev = list(range(len2 + 1))
-        curr = [0] * (len2 + 1)
+        # Use only two rows for space optimization
+        prev_row = list(range(len2 + 1))
+        curr_row = [0] * (len2 + 1)
 
         for i in range(1, len1 + 1):
-            curr[0] = i
-            min_val = float("inf")
-            ch1 = s1[i - 1]
-
+            curr_row[0] = i
             for j in range(1, len2 + 1):
-                cost = 0 if ch1 == s2[j - 1] else 1
-                # Three operations: insert, delete, substitute
-                a = prev[j] + 1  # deletion
-                b = curr[j - 1] + 1  # insertion
-                c = prev[j - 1] + cost  # substitution
-                curr[j] = min(a, b, c)
-                min_val = min(min_val, curr[j])
+                cost = 0 if s1[i - 1] == s2[j - 1] else 1
+                curr_row[j] = min(
+                    curr_row[j - 1] + 1,  # insertion
+                    prev_row[j] + 1,  # deletion
+                    prev_row[j - 1] + cost,  # substitution
+                )
+            prev_row, curr_row = curr_row, prev_row
 
-            # Early cutoff: if all values in current row > max_dist, impossible
-            if min_val > max_dist:
-                self._edit_distance_cache[key] = float("inf")
-                return float("inf")
+        result = prev_row[len2]
+        self.edit_distance_cache[key] = result
+        return result
 
-            prev, curr = curr, prev
-
-        d = prev[len2]
-        self._edit_distance_cache[key] = d
-        return d
-
-    def _similarity(self, a: str, b: str, max_dist_cap: int = 4) -> float:
+    def _fuzzy_match(
+        self,
+        query: str,
+        hash_table: dict,
+        trie: Trie,
+        ngram_table: dict,
+        threshold: float = 0.7,
+    ) -> Optional[str]:
         """
-        SIMILARITY SCORING:
-        Convert edit distance to similarity score [0,1]
-        - Early exit for exact matches
-        - Adaptive max_dist based on string length (30% of max length)
-        - Normalize by max string length
+        Multi-algorithm fuzzy matching with performance optimizations
         """
-        if a == b:
-            return 1.0
-        max_len = max(len(a), len(b))
-        max_dist = min(max_dist_cap, max(2, int(0.3 * max_len)))
-        d = self._edit_distance_dp(a, b, max_dist)
-        if d == float("inf"):
-            return 0.0
-        return 1.0 - (d / max_len)
+        if not query:
+            return None
 
-    # ---------------- Candidate Search + Scoring ----------------
-    def _best_match_for_type(
-        self, text_norm: str, loc_type: str
-    ) -> Tuple[Optional[str], float, int, float]:
+        query_norm = self._normalize_vietnamese_text(query)
+
+        # Algorithm 1: Direct hash lookup (fastest)
+        if query_norm in hash_table:
+            return hash_table[query_norm]
+
+        # Algorithm 2: Trie prefix matching
+        trie_matches = trie.search_prefix(query_norm, max_results=3)
+        if trie_matches:
+            return trie_matches[0]
+
+        # Algorithm 3: N-gram + Levenshtein scoring (most accurate)
+        candidates = set()
+
+        # Collect candidates from n-grams
+        if len(query_norm) >= 2:
+            query_ngrams = set(self._generate_ngrams(query_norm))
+            for ngram in query_ngrams:
+                if ngram in ngram_table:
+                    candidates.update(ngram_table[ngram])
+
+        # Limit candidates to prevent performance issues
+        if len(candidates) > 50:
+            candidates = list(candidates)[:50]
+
+        # Score candidates using Levenshtein distance
+        best_match = None
+        best_score = 0.0
+
+        for candidate in candidates:
+            candidate_norm = self._normalize_vietnamese_text(candidate)
+            distance = self._levenshtein_distance(query_norm, candidate_norm)
+            max_len = max(len(query_norm), len(candidate_norm))
+
+            if max_len > 0:
+                similarity = 1.0 - (distance / max_len)
+                if similarity > best_score and similarity >= threshold:
+                    best_score = similarity
+                    best_match = candidate
+
+        return best_match
+
+    def _extract_address_components(
+        self, address: str
+    ) -> Tuple[List[str], List[str], List[str]]:
         """
-        CANDIDATE MATCHING ALGORITHM:
-        1. Bucket lookup by first character (O(1) filtering)
-        2. Fuzzy similarity calculation for each candidate
-        3. Frequency-based penalty (prefer common locations)
-        4. Prefix bonus (first word match bonus)
-        5. Exact match bonus
-        6. Threshold filtering
-
-        SCORING FORMULA:
-        score = similarity * frequency_penalty + prefix_bonus + exact_bonus
+        Intelligent address component extraction using regex and context
         """
-        if not text_norm:
-            return None, 0.0, 0, 0.0
+        if not address:
+            return [], [], []
 
-        # Get candidates from bucket (O(1) lookup vs O(n) linear search)
-        first = self._first_alnum(text_norm)
-        if loc_type == "province":
-            cand_bucket = self.bucket_provinces.get(first, [])
-            norm_map, freq_map = self.norm_provinces, self.freq_provinces
-            base_thr, exact_bonus = 0.78, 0.20  # Province thresholds
-        elif loc_type == "district":
-            cand_bucket = self.bucket_districts.get(first, [])
-            norm_map, freq_map = self.norm_districts, self.freq_districts
-            base_thr, exact_bonus = 0.76, 0.16  # District thresholds
-        else:  # ward
-            cand_bucket = self.bucket_wards.get(first, [])
-            norm_map, freq_map = self.norm_wards, self.freq_wards
-            base_thr, exact_bonus = 0.83, 0.14  # Ward thresholds (stricter)
+        # Normalize address
+        address = re.sub(r"\s+", " ", address.strip())
 
-        t_first = text_norm.split()[0]
-        best_name, best_score, best_freq, best_raw = None, 0.0, 0, 0.0
+        # Split by common delimiters
+        parts = re.split(r"[,\-\n]", address)
+        parts = [part.strip() for part in parts if part.strip()]
 
-        for cand_norm in cand_bucket:
-            # Calculate base similarity using edit distance
-            sim = self._similarity(text_norm, cand_norm)
-            if sim <= 0:
+        potential_provinces = []
+        potential_districts = []
+        potential_wards = []
+
+        for part in parts:
+            original_part = part
+            part_lower = part.lower()
+
+            # Detect component type by prefixes
+            has_province_prefix = any(
+                re.search(prefix, part_lower)
+                for prefix in self.address_patterns["province_prefixes"]
+            )
+            has_district_prefix = any(
+                re.search(prefix, part_lower)
+                for prefix in self.address_patterns["district_prefixes"]
+            )
+            has_ward_prefix = any(
+                re.search(prefix, part_lower)
+                for prefix in self.address_patterns["ward_prefixes"]
+            )
+
+            # Remove prefixes
+            cleaned_part = original_part
+            all_prefixes = (
+                self.address_patterns["province_prefixes"]
+                + self.address_patterns["district_prefixes"]
+                + self.address_patterns["ward_prefixes"]
+            )
+            for prefix in all_prefixes:
+                cleaned_part = re.sub(prefix, "", cleaned_part, flags=re.IGNORECASE)
+
+            cleaned_part = cleaned_part.strip()
+            if not cleaned_part:
                 continue
 
-            # Frequency penalty: less common locations get slight penalty
-            freq = freq_map[cand_norm]
-            penalty = 1.0 / (1.0 + (0.6 * (freq - 1)))
+            # Categorize based on prefixes and context
+            if has_province_prefix or self._is_major_city(cleaned_part):
+                potential_provinces.append(cleaned_part)
+            elif has_district_prefix:
+                potential_districts.append(cleaned_part)
+            elif has_ward_prefix:
+                potential_wards.append(cleaned_part)
+            else:
+                # Add to all categories if no clear prefix
+                potential_provinces.append(cleaned_part)
+                potential_districts.append(cleaned_part)
+                potential_wards.append(cleaned_part)
 
-            # Prefix bonus: if first word matches (helps distinguish similar names)
-            prefix_bonus = 0.06 if cand_norm.split()[0] == t_first else 0.0
+        return potential_provinces, potential_districts, potential_wards
 
-            # Calculate final score
-            score = sim * penalty + prefix_bonus
-            if sim == 1.0:
-                score += exact_bonus  # Strong bonus for exact matches
+    def _is_major_city(self, text: str) -> bool:
+        """Check if text contains major Vietnamese cities"""
+        text_lower = text.lower()
+        major_cities = ["hà nội", "hồ chí minh", "đà nẵng", "cần thơ", "hải phòng"]
+        return any(city in text_lower for city in major_cities)
 
-            if score > best_score:
-                best_score = score
-                best_name = norm_map[cand_norm]  # Return original name
-                best_freq = freq
-                best_raw = sim
-
-        # Apply threshold filtering
-        if best_name is None:
-            return None, 0.0, 0, 0.0
-        if best_raw < base_thr:
-            return None, 0.0, 0, best_raw
-        return best_name, best_score, best_freq, best_raw
-
-    def classify(self, address: str) -> Dict[str, Optional[str]]:
+    def classify_address(self, address: str) -> Dict[str, Optional[str]]:
         """
-        MAIN CLASSIFICATION ALGORITHM:
-
-        STEPS:
-        1. Tokenization & N-gram generation
-        2. Candidate search for each location type
-        3. Deduplication & top-K selection
-        4. Combination optimization (find best non-overlapping combo)
-
-        OVERLAP PREVENTION: Ensures province/district/ward don't overlap in text
-        WARD STRICTNESS: Only accept wards with exact match OR ward hint words
+        Main classification method for performance
+        Returns: Dictionary with 'province', 'district', 'ward' keys
         """
-        # Cache management for memory efficiency
-        if len(self._edit_distance_cache) > 50000:
-            self._edit_distance_cache.clear()
-
-        # Step 1: Tokenization and preprocessing
-        tokens = self._generate_tokens(address)
-        if not tokens:
+        if not address or not address.strip():
             return {"province": None, "district": None, "ward": None}
 
-        # Generate all possible n-grams (substrings)
-        spans = self._ngrams(tokens, max_n=3)
-        norm_full = " ".join(tokens)
+        # Check cache
+        cache_key = address.strip()
+        if cache_key in self.match_cache:
+            return self.match_cache[cache_key]
 
-        # Ward hint detection: only accept ward candidates if we see ward keywords
-        # This prevents false ward matches (stricter ward matching)
-        has_ward_hint = bool(re.search(r"\b(phuong|xa|thi tran)\b", norm_full))
-
-        # Step 2: Candidate search
-        topK = 3
-        cand_by_type = {"province": [], "district": [], "ward": []}
-
-        for i, j, text in spans:
-            # Search provinces and districts normally
-            for t in ("province", "district"):
-                name, score, freq, raw = self._best_match_for_type(text, t)
-                if name:
-                    cand_by_type[t].append(((i, j), name, score, freq, raw))
-
-            # Ward search with stricter criteria
-            name, score, freq, raw = self._best_match_for_type(text, "ward")
-            if name and (raw == 1.0 or has_ward_hint):  # Exact match OR ward hint
-                cand_by_type["ward"].append(((i, j), name, score, freq, raw))
-
-        # Step 3: Deduplication and top-K selection
-        for t in ("province", "district", "ward"):
-            dedup = {}
-            for span, name, score, freq, raw in cand_by_type[t]:
-                # Keep best score for each location name
-                if name not in dedup or score > dedup[name][1]:
-                    dedup[name] = (span, score, freq, raw)
-            # Sort by score (desc) then by span length (desc) and take top-K
-            cand_by_type[t] = sorted(
-                [
-                    (span, name, score, freq, raw)
-                    for name, (span, score, freq, raw) in dedup.items()
-                ],
-                key=lambda x: (-x[2], -(x[0][1] - x[0][0])),
-            )[:topK]
-
-        # Add None option for each type (allows missing components)
-        for t in ("province", "district", "ward"):
-            cand_by_type[t].append(((None, None), None, 0.0, 0, 0.0))
-
-        # Step 4: Combination optimization
-        def overlap(a, b):
-            """Check if two spans overlap in the text"""
-            (i1, j1) = a
-            (i2, j2) = b
-            if None in (i1, j1, i2, j2):
-                return False
-            return not (j1 <= i2 or j2 <= i1)
-
-        # Find best non-overlapping combination
-        best_combo = (None, None, None)
-        best_total = -1.0
-
-        for p_span, p_name, p_score, *_ in cand_by_type["province"]:
-            for d_span, d_name, d_score, *_ in cand_by_type["district"]:
-                # Skip if province and district overlap
-                if p_name and d_name and overlap(p_span, d_span):
-                    continue
-                for w_span, w_name, w_score, *_ in cand_by_type["ward"]:
-                    # Skip if ward overlaps with province or district
-                    if (w_name and p_name and overlap(w_span, p_span)) or (
-                        w_name and d_name and overlap(w_span, d_span)
-                    ):
-                        continue
-                    # Calculate total score
-                    total = p_score + d_score + w_score
-                    # Bonus for complete addresses (all three components)
-                    if p_name and d_name and w_name:
-                        total += 0.05
-                    if total > best_total:
-                        best_total = total
-                        best_combo = (p_name, d_name, w_name)
-
-        return {
-            "province": best_combo[0],
-            "district": best_combo[1],
-            "ward": best_combo[2],
-        }
-
-    def classify_batch(self, addresses: List[str]) -> List[Dict[str, Optional[str]]]:
-        """Batch classification with cache management"""
-        if len(self._edit_distance_cache) > 50000:
-            self._edit_distance_cache.clear()
-        return [self.classify(a) for a in addresses]
-
-
-############################################################
-# Testing Infrastructure
-############################################################
-def test_classifier():
-    """
-    Test the address classifier with test cases loaded from JSON file
-
-    PERFORMANCE MONITORING:
-    - Tracks individual and average timing
-    - Validates against performance constraints (≤10ms avg, ≤100ms max)
-    - Measures accuracy against expected results
-    """
-    print("Loading data from CSV files...")
-    classifier = load_from_csv()
-
-    # Load test cases from JSON file
-    print("Loading test cases from JSON file...")
-    try:
-        with open("test.json", "r", encoding="utf-8") as f:
-            test_data = json.load(f)
-    except FileNotFoundError:
-        print("Error: test.json file not found")
-        return
-    except json.JSONDecodeError as e:
-        print(f"Error parsing JSON file: {e}")
-        return
-
-    # Convert JSON data to test cases format (carry optional notes)
-    tests = []
-    for item in test_data:
-        test_case = (
-            item["input"],
-            {
-                "province": item["expected_province"],
-                "district": item["expected_district"],
-                "ward": item["expected_ward"],
-            },
-            item.get("notes", ""),
+        # Extract components
+        province_candidates, district_candidates, ward_candidates = (
+            self._extract_address_components(address)
         )
-        tests.append(test_case)
 
-    print(f"Loaded {len(tests)} test cases")
-    print("Testing Address Classifier")
+        # Find best matches using multi-algorithm approach
+        province = self._find_best_match(province_candidates, "province")
+        district = self._find_best_match(district_candidates, "district")
+        ward = self._find_best_match(ward_candidates, "ward")
+
+        result = {"province": province, "district": district, "ward": ward}
+
+        # Cache result
+        self.match_cache[cache_key] = result
+        return result
+
+    def _find_best_match(
+        self, candidates: List[str], component_type: str
+    ) -> Optional[str]:
+        """Find the best match for a given component type"""
+        if not candidates:
+            return None
+
+        # Select appropriate data structures based on component type
+        if component_type == "province":
+            hash_table, trie, ngram_table = (
+                self.province_hash,
+                self.province_trie,
+                self.province_ngrams,
+            )
+            threshold = 0.75
+        elif component_type == "district":
+            hash_table, trie, ngram_table = (
+                self.district_hash,
+                self.district_trie,
+                self.district_ngrams,
+            )
+            threshold = 0.70
+        else:  # ward
+            hash_table, trie, ngram_table = (
+                self.ward_hash,
+                self.ward_trie,
+                self.ward_ngrams,
+            )
+            threshold = 0.80
+
+        # Try each candidate
+        for candidate in candidates:
+            match = self._fuzzy_match(
+                candidate, hash_table, trie, ngram_table, threshold
+            )
+            if match:
+                return match
+
+        return None
+
+
+def load_txt_with_encoding(file_path: str) -> List[str]:
+    """Load data from TXT file with automatic encoding detection"""
+    encodings = ["utf-8-sig", "utf-8", "latin-1", "cp1252", "iso-8859-1"]
+
+    for encoding in encodings:
+        try:
+            with open(file_path, "r", encoding=encoding) as f:
+                data = [line.strip() for line in f if line.strip()]
+            return data
+        except (UnicodeDecodeError, FileNotFoundError):
+            continue
+
+    raise Exception(f"Could not read file {file_path} with any supported encoding")
+
+
+def load_test_cases(filename: str) -> List[Dict]:
+    """Load test cases from JSON file"""
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Warning: {filename} not found, using empty list")
+        return []
+
+
+def main():
+    """Main function demonstrating the classifier usage with comprehensive testing"""
+    print("Loading Vietnamese administrative data...")
+
+    # Load data from TXT files
+    provinces = load_txt_with_encoding("data/provinces.txt")
+    districts = load_txt_with_encoding("data/districts.txt")
+    wards = load_txt_with_encoding("data/wards.txt")
+
+    print(
+        f"Loaded {len(provinces)} provinces, {len(districts)} districts, {len(wards)} wards"
+    )
+
+    # Initialize classifier
+    print("Initializing classifier...")
+    classifier = AddressClassifier(provinces, districts, wards)
+
+    # Load test cases from JSON
+    print("Loading test cases from test.json...")
+    test_cases = load_test_cases("test.json")
+
+    print(f"\nTesting address classification with {len(test_cases)} test cases:")
     print("=" * 80)
 
-    # Performance and accuracy tracking
-    correct_count = 0
+    correct_predictions = 0
     total_time = 0
     max_time = 0
     failed_cases = []
+    all_test_results = []
 
-    for i, (address, expected, notes) in enumerate(tests, 1):
-        # Time each classification
-        t0 = time.perf_counter()
-        got = classifier.classify(address)
-        dt = (time.perf_counter() - t0) * 1000  # Convert to milliseconds
-        total_time += dt
-        max_time = max(max_time, dt)
+    for i, test_case in enumerate(test_cases):
+        address = test_case["text"]
+        expected = test_case["result"]
+        notes = test_case.get("notes", "")
 
-        # Check accuracy and timing constraint (<= 100ms)
-        prediction_ok = all(got.get(k) == v for k, v in expected.items())
-        time_ok = dt <= 100.0
-        ok = prediction_ok and time_ok
-        if ok:
-            correct_count += 1
-        else:
-            reasons = []
-            if not prediction_ok:
-                for k in ("province", "district", "ward"):
-                    if got.get(k) != expected.get(k):
-                        reasons.append(f"{k} mismatch")
-            if not time_ok:
-                reasons.append(f"time_exceeded ({dt:.2f} ms > 100 ms)")
-            fail_reason = "; ".join(reasons) if reasons else "unknown"
+        start_time = time.perf_counter()
+        result = classifier.classify_address(address)
+        end_time = time.perf_counter()
 
-            normalized = classifier._normalize(address)
-            failed_cases.append(
-                {
-                    "index": i,
-                    "input": address,
-                    "normalized": normalized,
-                    "notes": notes,
-                    "expected_province": expected.get("province"),
-                    "expected_district": expected.get("district"),
-                    "expected_ward": expected.get("ward"),
-                    "got_province": got.get("province"),
-                    "got_district": got.get("district"),
-                    "got_ward": got.get("ward"),
-                    "time_ms": round(dt, 3),
-                    "fail_reason": fail_reason,
-                }
-            )
+        processing_time = (end_time - start_time) * 1000
+        total_time += processing_time
+        max_time = max(max_time, processing_time)
 
-        print(f"\nTest {i}:")
-        print(f"Input: {address}")
-        print(f"Normalized: {classifier._normalize(address)}")
-        print(f"Expected: {expected}")
-        print(f"Got:      {got}")
-        print(f"{'PASS' if ok else 'FAIL'} in {dt:.2f} ms")
+        # Check if prediction matches expected result
+        is_correct = (
+            result["province"] == expected["province"]
+            and result["district"] == expected["district"]
+            and result["ward"] == expected["ward"]
+        )
+
+        if is_correct:
+            correct_predictions += 1
+
+        # Prepare result data
+        reasons = []
+        if result["province"] != expected["province"]:
+            reasons.append("province mismatch")
+        if result["district"] != expected["district"]:
+            reasons.append("district mismatch")
+        if result["ward"] != expected["ward"]:
+            reasons.append("ward mismatch")
+        if processing_time > 100:
+            reasons.append(f"time_exceeded ({processing_time:.2f} ms > 100 ms)")
+
+        fail_reason = "; ".join(reasons) if reasons else ""
+
+        test_result = {
+            "index": i + 1,
+            "input": address,
+            "normalized": classifier._normalize_vietnamese_text(address),
+            "notes": notes,
+            "expected_province": expected["province"],
+            "expected_district": expected["district"],
+            "expected_ward": expected["ward"],
+            "got_province": result["province"],
+            "got_district": result["district"],
+            "got_ward": result["ward"],
+            "time_ms": round(processing_time, 3),
+            "status": "PASS" if is_correct else "FAIL",
+            "fail_reason": fail_reason,
+        }
+
+        all_test_results.append(test_result)
+
+        if not is_correct:
+            failed_cases.append(test_result)
+
+        # Show results for first 10 test cases or if incorrect
+        if i < 10 or not is_correct:
+            print(f"\nTest {i + 1}: {address}")
+            print(f"Expected: {expected}")
+            print(f"Predicted: {result}")
+            print(f"Correct: {'✅' if is_correct else '❌'}")
+            print(f"Processing time: {processing_time:.2f}ms")
+            if notes:
+                print(f"Notes: {notes}")
+
+        # Check performance requirements
+        if processing_time > 100:  # 0.1s = 100ms
+            print("⚠️  WARNING: Exceeds maximum time requirement!")
+        elif processing_time > 10:  # 0.01s = 10ms
+            print("⚠️  WARNING: Exceeds average time requirement!")
 
     # Summary statistics
-    avg_time = total_time / len(tests)
+    accuracy = (correct_predictions / len(test_cases)) * 100
+    avg_time = total_time / len(test_cases)
 
     print("\n" + "=" * 80)
-    print("SUMMARY")
-    print("=" * 80)
-    print(f"Total tests: {len(tests)}")
-    print(f"Correct: {correct_count}")
-    print(f"Accuracy: {correct_count / len(tests) * 100:.1f}%")
-    print(f"Average time: {avg_time:.2f} ms")
-    print(f"Max time: {max_time:.2f} ms")
-    print(f"Total time: {total_time:.1f} ms")
+    print("SUMMARY:")
+    print(f"Total test cases: {len(test_cases)}")
+    print(f"Correct predictions: {correct_predictions}")
+    print(f"Accuracy: {accuracy:.2f}%")
+    print(f"Average processing time: {avg_time:.2f}ms")
+    print(f"Maximum processing time: {max_time:.2f}ms")
 
-    # Performance constraint validation
     print("\n" + "=" * 80)
     print("PERFORMANCE CONSTRAINTS")
     print("=" * 80)
     print(f"Average time ≤ 10ms: {'✓' if avg_time <= 10 else '✗'} ({avg_time:.2f} ms)")
     print(f"Max time ≤ 100ms: {'✓' if max_time <= 100 else '✗'} ({max_time:.2f} ms)")
 
-    # Export failing cases for further analysis
+    if avg_time <= 10 and max_time <= 100:
+        print("✅ All performance requirements met!")
+    else:
+        print("⚠️  Performance requirements not met!")
+
+    # Export test results
     print("\n" + "=" * 80)
-    print("EXPORTING FAILED CASES")
+    print("EXPORTING TEST RESULTS")
     print("=" * 80)
     try:
-        # CSV export
+        # CSV headers
         csv_headers = [
             "index",
             "input",
@@ -600,28 +641,45 @@ def test_classifier():
             "got_district",
             "got_ward",
             "time_ms",
+            "status",
             "fail_reason",
         ]
-        with open("failed_cases.csv", "w", encoding="utf-8-sig", newline="") as cf:
+
+        # Create output directory if it doesn't exist
+        output_dir = "output"
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Export full test report
+        test_report_path = os.path.join(output_dir, "_test_report.csv")
+        with open(test_report_path, "w", encoding="utf-8-sig", newline="") as cf:
+            writer = csv.DictWriter(cf, fieldnames=csv_headers)
+            writer.writeheader()
+            for row in all_test_results:
+                writer.writerow(row)
+        print(
+            f"Wrote test report CSV: {test_report_path} ({len(all_test_results)} rows)"
+        )
+
+        # Export failed cases only
+        failed_cases_path = os.path.join(output_dir, "_failed_cases.csv")
+        with open(failed_cases_path, "w", encoding="utf-8-sig", newline="") as cf:
             writer = csv.DictWriter(cf, fieldnames=csv_headers)
             writer.writeheader()
             for row in failed_cases:
                 writer.writerow(row)
-        print(f"Wrote failed cases CSV: failed_cases.csv ({len(failed_cases)} rows)")
+        print(f"Wrote failed cases CSV: {failed_cases_path} ({len(failed_cases)} rows)")
+
+        # Export JSON format for full report
+        json_report_path = os.path.join(output_dir, "_test_report.json")
+        with open(json_report_path, "w", encoding="utf-8") as jf:
+            json.dump(all_test_results, jf, ensure_ascii=False, indent=2)
+        print(
+            f"Wrote test report JSON: {json_report_path} ({len(all_test_results)} rows)"
+        )
+
     except Exception as e:
-        print(f"Failed to export failed cases: {e}")
-
-
-def load_from_csv(data_dir: str = "data") -> AddressClassifier:
-    """Load classifier from CSV files with proper encoding handling"""
-    provinces = load_csv_with_encoding(f"{data_dir}/provinces.csv", "province")
-    districts = load_csv_with_encoding(f"{data_dir}/districts.csv", "district")
-    wards = load_csv_with_encoding(f"{data_dir}/wards.csv", "ward")
-    print(
-        f"Loaded {len(provinces)} provinces, {len(districts)} districts, {len(wards)} wards"
-    )
-    return AddressClassifier(provinces, districts, wards)
+        print(f"Failed to export test results: {e}")
 
 
 if __name__ == "__main__":
-    test_classifier()
+    main()

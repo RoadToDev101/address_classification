@@ -215,3 +215,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+addresses_detailed_results.json
+*.progress
+
+*.geojson
+
+/output/*.csv
+/output/*.json
+/output/*.txt
