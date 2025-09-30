@@ -8,17 +8,10 @@ import unicodedata
 import time
 import json
 import csv
-import sys
-import io
 import os
 from collections import defaultdict
 from functools import lru_cache
 from typing import Dict, List, Optional, Tuple
-
-# Set console encoding to UTF-8 for proper Vietnamese character display
-if sys.platform == "win32":
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 
 class TrieNode:
