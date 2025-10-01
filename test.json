@@ -1812,8 +1812,8 @@
     "text": "357/28,Ng-T- Thuật,P1,Q3,TP.HồChíMinh.",
     "result": {
       "province": "Hồ Chí Minh",
-      "district": "",
-      "ward": ""
+      "district": "3",
+      "ward": "1"
     },
     "notes": "public test case"
   },
@@ -2054,9 +2054,9 @@
   {
     "text": "Tiểu khu 3, thị trấn Ba Hàng, huyện Phổ Yên, tỉnh Thái Nguyên.",
     "result": {
-      "province": "",
-      "district": "",
-      "ward": ""
+      "province": "Thái Nguyên",
+      "district": "Phổ Yên",
+      "ward": "Ba Hàng"
     },
     "notes": "public test case"
   },
@@ -2189,9 +2189,9 @@
   {
     "text": "154/4/81 Nguyễn - Phúc Chu, P15, TB, TP. Hồ Chí Minh",
     "result": {
-      "province": "",
+      "province": "Hồ Chí Minh",
       "district": "",
-      "ward": ""
+      "ward": "15"
     },
     "notes": "public test case"
   },
@@ -2567,9 +2567,9 @@
   {
     "text": "Khu phố Nam Tân, TT Thuận Nam, Hàm Thuận Bắc, Bình Thuận.",
     "result": {
-      "province": "",
-      "district": "",
-      "ward": ""
+      "province": "Bình Thuận",
+      "district": "Hàm Thuận Bắc",
+      "ward": "Thuận Nam"
     },
     "notes": "public test case"
   },
@@ -2774,7 +2774,7 @@
   {
     "text": "- Khu B Chu Hoà, Việt HhiPhú Thọ",
     "result": {
-      "province": "",
+      "province": "Phú Thọ",
       "district": "",
       "ward": ""
     },
