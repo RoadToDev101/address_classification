@@ -587,7 +587,6 @@ if __name__ == "__main__":
     from segment import Trie
     from spelling_correction import (
         build_spelling_correction_trie,
-        correct_address_spelling,
         load_vietnamese_dictionary,
     )
 
@@ -599,17 +598,17 @@ if __name__ == "__main__":
         segment_trie.insert(word.lower())
 
     tests = [
-        # "X Tây Yên, H.An Biên, TKiên Giang",
-        # "Thanh Long, Yên Mỹ Hưng Yên",
-        # "X.Nga Thanh hyện Nga son TỉnhThanhQ Hóa",
-        # " Duy Phú,  Duy Xuyen,  Quang Nam",
-        # " Đức Lĩnh,Vũ Quang,",
-        # "Thi trấ Ea. Knốp,H. Ea Kar,",
-        # ", Nam Đông,T. T.T.H",
-        # "P4 T.Ph9ốĐông Hà ",
-        # "Xã Thịnh Sơn H., Đô dương T. Nghệ An",
-        # "Phưng Khâm Thiên Quận Đ.Đa T.Phố HàNội",
-        # "Tiểu khu 3, thị trấn Ba Hàng, huyện Phổ Yên, tỉnh Thái Nguyên.",
+        "X Tây Yên, H.An Biên, TKiên Giang",
+        "Thanh Long, Yên Mỹ Hưng Yên",
+        "X.Nga Thanh hyện Nga son TỉnhThanhQ Hóa",
+        " Duy Phú,  Duy Xuyen,  Quang Nam",
+        " Đức Lĩnh,Vũ Quang,",
+        "Thi trấ Ea. Knốp,H. Ea Kar,",
+        ", Nam Đông,T. T.T.H",
+        "P4 T.Ph9ốĐông Hà ",
+        "Xã Thịnh Sơn H., Đô dương T. Nghệ An",
+        "Phưng Khâm Thiên Quận Đ.Đa T.Phố HàNội",
+        "Tiểu khu 3, thị trấn Ba Hàng, huyện Phổ Yên, tỉnh Thái Nguyên.",
         "PhườngNguyễn Trãi, T.P Kon Tum, T Kon Tum",
         "285 B/1A Bình Gĩa Phường 8,Vũng Tàu,Bà Rịa - Vũng Tàu",
         "Khu phố Nam Tân, TT Thuận Nam, Hàm Thuận Bắc, Bình Thuận.",
@@ -624,13 +623,14 @@ if __name__ == "__main__":
         normalized = normalize_input(test_address, debug=False)
         print(f"NORMALIZED: {normalized}")
         # segmented = segment_text_using_common_vn_words(test_address, segment_trie)
-        corrected_address, corrections = correct_address_spelling(
-            address=normalized,
-            spelling_trie=spelling_trie,
-            segment_trie=segment_trie,
-            debug=True,
-        )
-        expanded = expand_abbreviations(corrected_address)
+        # corrected_address, corrections = correct_address_spelling(
+        #     address=normalized,
+        #     spelling_trie=spelling_trie,
+        #     segment_trie=segment_trie,
+        #     debug=True,
+        # )
+        # expanded = expand_abbreviations(corrected_address)
+        expanded = expand_abbreviations(normalized)
         result = suggest_address_components(expanded)
         end_time = time.perf_counter()
         elapsed_time_ms = (end_time - start_time) * 1000

@@ -82,9 +82,16 @@ def correct_word(
         or word_lower in {"-", ".", ",", "/", "\\", "(", ")", "[", "]", "{", "}"}
     ):
         return word, False, 0
+    # Adaptive distance based on word length
+    adaptive_distance = 1 if len(word_lower) <= 4 else max_distance
+    # First try exact match (O(log n))
     if is_valid_vietnamese_word(word_lower, spelling_trie):
         return word, False, 0
-    matches = spelling_trie.search(word_lower, max_distance)
+    # Then try distance=1 first (faster)
+    matches = spelling_trie.search(word_lower, min(1, adaptive_distance))
+    if not matches and adaptive_distance > 1:
+        # Only search distance=2 if no close matches found
+        matches = spelling_trie.search(word_lower, adaptive_distance)
     if matches:
         scored_matches = [
             (
@@ -134,7 +141,6 @@ def pre_correct_administrative_words(
                 token.lower(),
             )
 
-            # NEW: Skip blacklisted words
             if clean_token.lower() in BLACK_LIST_KEYWORDS or len(clean_token) < 3:
                 corrected_tokens.append(token)
                 continue
@@ -195,12 +201,25 @@ def correct_address_spelling(
     if debug:
         print(f"Pre-corrected: {pre_corrected}")
 
-    # Now segment the pre-corrected text
     segmented_text = segment(pre_corrected, segment_trie)
-
-    # Continue with existing token-level correction...
     tokens = segmented_text.split()
 
+    # Build set of known-valid administrative words (avoid re-checking)
+    admin_terms = {
+        "huyện",
+        "quận",
+        "xã",
+        "phường",
+        "thị",
+        "trấn",
+        "tỉnh",
+        "thành",
+        "phố",
+    }
+    admin_terms = admin_terms.union(set(ADMIN_ABBREVIATION_MAP.keys()))
+    skip_set = (
+        admin_terms | set(PROVINCE_ABBREVIATIONS.keys()) | set(BLACK_LIST_KEYWORDS)
+    )
     corrected_tokens = []
     corrections_made = []
 
@@ -211,6 +230,11 @@ def correct_address_spelling(
             "",
             token,
         )
+
+        # Skip if already a known administrative term or blacklisted
+        if clean_token in skip_set or len(clean_token) < 2:
+            corrected_tokens.append(token)
+            continue
 
         if clean_token:
             corrected_word, was_corrected, distance = correct_word(

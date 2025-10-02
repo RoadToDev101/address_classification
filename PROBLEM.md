@@ -7,8 +7,8 @@ Classify an input address string into province, district, and ward, despite inco
 
 **Constraints**:
 
-- Max time per request: ≤0.1s
-- Avg time per request: ≤0.01s
+- Max time per request: ≤0.1s (100ns)
+- Avg time per request: ≤0.01s (10ms)
 - No machine learning; use algorithmic approach only
 - Use Dynamic Programming (recommended by instructor)
 - Handle spelling errors and inconsistencies
