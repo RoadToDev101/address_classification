@@ -683,7 +683,7 @@ def main():
         sys.exit(1)
 
     if not args.quiet:
-        print(f"=== Generating Test Cases ===")
+        print("=== Generating Test Cases ===")
         print(f"Input file: {args.input}")
         print(f"Output file: {args.output}")
         print(f"Max per group: {args.max_per_group}")
