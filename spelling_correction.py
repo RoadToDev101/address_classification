@@ -1,15 +1,16 @@
+import re
 from typing import List, Tuple
-from bk_tree import BKTree
-from segment import segment
+
+from bk_tree import BKTree, levenshtein_distance
 from pre_processing import (
-    PROVINCE_ABBREVIATIONS,
     ADMIN_ABBREVIATION_MAP,
     BLACK_LIST_KEYWORDS,
-    expand_abbreviations,
+    PROVINCE_ABBREVIATIONS,
     normalize_input,
+    expand_abbreviations,
 )
-import re
-from bk_tree import levenshtein_distance
+from segment import segment, Trie
+from utils.time_perf import time_performance_measure
 
 
 def load_vietnamese_dictionary(
@@ -27,7 +28,7 @@ def load_vietnamese_dictionary(
 
 
 def build_spelling_correction_trie() -> BKTree:
-    """Build BK-Trie for spelling correction using Vietnamese dictionary"""
+    """Build BK-Tree for spelling correction"""
     dictionary_words = load_vietnamese_dictionary()
     dictionary_words = dictionary_words + [
         abbr.lower() for abbr in PROVINCE_ABBREVIATIONS.keys()
@@ -36,7 +37,6 @@ def build_spelling_correction_trie() -> BKTree:
         abbr.lower() for abbr in ADMIN_ABBREVIATION_MAP.keys()
     ]
     dictionary_words = dictionary_words + [word.lower() for word in BLACK_LIST_KEYWORDS]
-    # Add common street keywords
     dictionary_words = list(set(dictionary_words))
     if not dictionary_words:
         return BKTree()
@@ -49,111 +49,128 @@ def build_spelling_correction_trie() -> BKTree:
 def is_valid_vietnamese_word(word: str, spelling_trie: BKTree) -> bool:
     """Check if a word exists in the Vietnamese dictionary"""
     if not word or not word.strip():
-        return True  # Consider empty words as valid (no correction needed)
-
-    # Check for exact match (case-insensitive)
+        return True
     exact_match = spelling_trie.get_exact_match(word.lower())
     return exact_match is not None
 
 
 def calculate_word_similarity_score(original: str, candidate: str) -> float:
-    """
-    Calculate similarity score between original and candidate word.
-    Higher score means better match.
-    """
+    """Calculate similarity score between original and candidate word"""
     if not original or not candidate:
         return 0.0
-
-    # Prefer longer matches
     length_bonus = min(len(candidate), len(original)) / max(
         len(candidate), len(original)
     )
-
-    # Prefer words that start with the same characters
-    common_prefix = 0
-    for i, (c1, c2) in enumerate(zip(original, candidate)):
-        if c1 == c2:
-            common_prefix += 1
-        else:
-            break
+    common_prefix = sum(1 for c1, c2 in zip(original, candidate) if c1 == c2)
     prefix_score = common_prefix / max(len(original), len(candidate))
-
-    # Calculate overall similarity
     edit_distance = levenshtein_distance(original, candidate)
     max_length = max(len(original), len(candidate))
     distance_score = 1 - (edit_distance / max_length) if max_length > 0 else 0
-
-    # Combine scores (weighted)
-    final_score = (distance_score * 0.6) + (prefix_score * 0.3) + (length_bonus * 0.1)
-    return final_score
+    return (distance_score * 0.6) + (prefix_score * 0.3) + (length_bonus * 0.1)
 
 
 def correct_word(
     word: str, spelling_trie: BKTree, max_distance: int = 2
 ) -> Tuple[str, bool, int]:
-    """
-    Correct a single word using the spelling trie with improved scoring
-
-    Args:
-        word: Word to correct
-        spelling_trie: BK-Trie containing dictionary words
-        max_distance: Maximum edit distance for suggestions
-
-    Returns:
-        Tuple of (corrected_word, was_corrected, edit_distance)
-    """
+    """Correct a single word using the spelling trie"""
     if not word or not word.strip():
         return word, False, 0
-
     word_lower = word.lower().strip()
-
-    # Skip numbers and very short words
-    if word_lower.isdigit() or len(word_lower) < 2:
+    if (
+        word_lower.isdigit()
+        or len(word_lower) < 2
+        or word_lower in {"-", ".", ",", "/", "\\", "(", ")", "[", "]", "{", "}"}
+    ):
         return word, False, 0
-
-    # Skip common punctuation and special characters
-    if word_lower in {"-", ".", ",", "/", "\\", "(", ")", "[", "]", "{", "}"}:
-        return word, False, 0
-
-    # Check if word is already correct
     if is_valid_vietnamese_word(word_lower, spelling_trie):
         return word, False, 0
-
-    # Find spelling corrections
     matches = spelling_trie.search(word_lower, max_distance)
-
     if matches:
-        # Score all matches and pick the best one
-        scored_matches = []
-        for candidate, distance in matches:
-            similarity_score = calculate_word_similarity_score(word_lower, candidate)
-            # Combine distance and similarity (lower distance is better, higher similarity is better)
-            combined_score = similarity_score - (
-                distance * 0.1
-            )  # Penalize distance slightly
-            scored_matches.append(
-                (candidate, distance, similarity_score, combined_score)
+        scored_matches = [
+            (
+                candidate,
+                distance,
+                calculate_word_similarity_score(word_lower, candidate),
+                calculate_word_similarity_score(word_lower, candidate)
+                - (distance * 0.1),
             )
-
-        # Sort by combined score (descending)
+            for candidate, distance in matches
+        ]
         scored_matches.sort(key=lambda x: x[3], reverse=True)
-
-        best_match, distance, similarity, combined = scored_matches[0]
-
-        # Only suggest correction if it's reasonable
+        best_match, distance, similarity, _ = scored_matches[0]
         if distance <= max_distance and similarity > 0.3:
             return best_match, True, distance
-
-    # No good correction found
     return word, False, float("inf")
 
 
+def pre_correct_administrative_words(
+    text: str, spelling_trie: BKTree, max_distance: int = 1
+) -> str:
+    from pre_processing import BLACK_LIST_KEYWORDS  # Import at top
+
+    admin_keywords = [
+        "huyện",
+        "quận",
+        "xã",
+        "phường",
+        "thị",
+        "trấn",
+        "tỉnh",
+        "thành",
+        "phố",
+    ]
+
+    parts = text.split(",")
+    corrected_parts = []
+
+    for part in parts:
+        tokens = part.strip().split()
+        corrected_tokens = []
+
+        for token in tokens:
+            clean_token = re.sub(
+                r"[^\w\sàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]",
+                "",
+                token.lower(),
+            )
+
+            # NEW: Skip blacklisted words
+            if clean_token.lower() in BLACK_LIST_KEYWORDS or len(clean_token) < 3:
+                corrected_tokens.append(token)
+                continue
+
+            # Check if valid in dictionary
+            if is_valid_vietnamese_word(clean_token, spelling_trie):
+                corrected_tokens.append(token)
+                continue
+
+            # Only correct if similar to admin keyword
+            best_match = None
+            best_distance = float("inf")
+
+            for admin_word in admin_keywords:
+                distance = levenshtein_distance(clean_token, admin_word)
+                if distance <= max_distance and distance < best_distance:
+                    best_match = admin_word
+                    best_distance = distance
+
+            if best_match:
+                corrected_tokens.append(best_match)
+            else:
+                corrected_tokens.append(token)
+
+        corrected_parts.append(" ".join(corrected_tokens))
+
+    return ", ".join(corrected_parts)
+
+
+@time_performance_measure
 def correct_address_spelling(
     address: str,
     spelling_trie: BKTree,
+    segment_trie: Trie,
     max_distance: int = 2,
     debug: bool = False,
-    dictionary: List[str] = None,
 ) -> Tuple[str, List[dict]]:
     """
     Correct spelling errors in Vietnamese address text
@@ -170,24 +187,18 @@ def correct_address_spelling(
     if not address or not address.strip():
         return address, []
 
-    # Segment the address first
-    if dictionary is None:
-        # Fallback: use spelling_trie words if no dictionary provided
-        if hasattr(spelling_trie, "root") and hasattr(spelling_trie.root, "word"):
-            # Collect all words from BKTree (not efficient, but fallback)
-            def collect_words(node):
-                words = []
-                if node.word:
-                    words.append(node.word)
-                for child in getattr(node, "children", {}).values():
-                    words.extend(collect_words(child))
-                return words
+    # PRE-CORRECTION: Fix administrative terms before segmentation
+    pre_corrected = pre_correct_administrative_words(
+        address.lower(), spelling_trie, max_distance=1
+    )
 
-            dictionary = collect_words(spelling_trie.root)
-        else:
-            dictionary = []
+    if debug:
+        print(f"Pre-corrected: {pre_corrected}")
 
-    segmented_text = segment(address.lower(), dictionary)
+    # Now segment the pre-corrected text
+    segmented_text = segment(pre_corrected, segment_trie)
+
+    # Continue with existing token-level correction...
     tokens = segmented_text.split()
 
     corrected_tokens = []
@@ -205,11 +216,9 @@ def correct_address_spelling(
             corrected_word, was_corrected, distance = correct_word(
                 clean_token, spelling_trie, max_distance
             )
-
             if was_corrected:
                 corrected_token = token.replace(clean_token, corrected_word)
                 corrected_tokens.append(corrected_token)
-
                 correction_info = {
                     "position": i,
                     "original": clean_token,
@@ -219,7 +228,6 @@ def correct_address_spelling(
                     "full_token_corrected": corrected_token,
                 }
                 corrections_made.append(correction_info)
-
                 if debug:
                     print(
                         f"Corrected: '{clean_token}' -> '{corrected_word}' (distance: {distance})"
@@ -230,7 +238,6 @@ def correct_address_spelling(
             corrected_tokens.append(token)
 
     corrected_address = " ".join(corrected_tokens)
-
     if debug and corrections_made:
         print(f"Original: {address}")
         print(f"Segmented: {segmented_text}")
@@ -246,8 +253,14 @@ def correct_address_spelling(
 if __name__ == "__main__":
     import time
 
-    # Example usage
+    from segment import Trie
+
+    # Load dictionary and build tries once
+    segment_dictionary = load_vietnamese_dictionary()
     spelling_trie = build_spelling_correction_trie()
+    segment_trie = Trie()
+    for word in segment_dictionary:
+        segment_trie.insert(word.lower())
 
     tests = [
         "X Tây Yên, H.An Biên, TKiên Giang",
@@ -271,20 +284,24 @@ if __name__ == "__main__":
     # Test the spelling correction
     for test_address in tests:
         print(f"\nTesting address: {test_address}")
-        # corrected_address, corrections = correct_address_spelling(
-        #     test_address, spelling_trie, debug=True
-        # )
         start_time = time.perf_counter()
         normalized = normalize_input(test_address)
-        expanded = expand_abbreviations(normalized)
+        print(f"Normalized: {normalized}")
+        # segmented = segment_text_using_common_vn_words(test_address, segment_trie)
         corrected_address, corrections = correct_address_spelling(
-            expanded, spelling_trie, debug=True
+            address=normalized,
+            spelling_trie=spelling_trie,
+            segment_trie=segment_trie,
+            debug=True,
         )
+        expanded = expand_abbreviations(corrected_address)
+
         end_time = time.perf_counter()
         elapsed_time_ms = (end_time - start_time) * 1000
         if elapsed_time_ms > 10:
             print(
                 f"WARNING: Pre-processing took {elapsed_time_ms:.4f} ms, exceeding 10ms limit."
             )
-        print(f"Pre-processing time: {elapsed_time_ms:.4f} ms")
-        print(f"Final Corrected Address: {corrected_address}")
+        else:
+            print(f"Pre-processing time: {elapsed_time_ms:.4f} ms")
+        print(f"Finish Spell Check: {expanded}")

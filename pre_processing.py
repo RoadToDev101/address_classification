@@ -1,5 +1,7 @@
 import re
 
+from utils.time_perf import time_performance_measure
+
 # ============================================================================
 # CONFIGURATION / CONSTANTS
 # ============================================================================
@@ -105,6 +107,7 @@ _CONCAT_ADMIN_PATTERN = re.compile(
 )
 _ABBREVIATED_PREFIX_PATTERN = re.compile(r"\b(tp|tx|tt)([a-zà-ỹ])")
 _MERGE_TPH_PATTERN = re.compile(r"t\.\s+(phố|ph)(?=\s|$|[0-9])", re.IGNORECASE)
+_MERGE_TP_PATTERN = re.compile(r"\bt\.\s*p\.?\s*(?=\s|$)", re.IGNORECASE)
 _MERGE_TX_PATTERN = re.compile(r"t\.\s+x\.")
 _MERGE_TT_PATTERN = re.compile(r"t\.\s+t\.")
 _ENSURE_SPACING_PATTERN = re.compile(r"(tp\.|tx\.|tt\.)([0-9])")
@@ -139,42 +142,67 @@ def resolve_province_abbreviations(text: str) -> str:
 # ============================================================================
 
 
-def normalize_input(address_input: str) -> str:
+@time_performance_measure
+def normalize_input(address_input: str, debug: bool = False) -> str:
     """Normalization pipeline combining multiple operations."""
+    if debug:
+        print(f"RAW INPUT: '{address_input}'")
     # Phase 1: Province abbreviations
     text = resolve_province_abbreviations(address_input)
+
+    if debug:
+        print(f"AFTER PROVINCE ABBREV RESOLUTION: '{text}'")
 
     # Phase 2: Basic normalization (combined)
     text = " ".join(text.lower().split())
     text = text.replace("-", "").rstrip(".")
 
-    # Phase 3: Punctuation spacing (combined)
+    if debug:
+        print(f"AFTER BASIC NORMALIZATION: '{text}'")
+
+    # Phase 3: Punctuation spacing
     text = _COMMA_AFTER_DOT_PATTERN.sub(", ", text)
     text = _SPACE_AFTER_DOT_PATTERN.sub(". ", text)
+    if debug:
+        print(f"AFTER PUNCTUATION SPACING: '{text}'")
 
-    # Phase 4: Prefix handling
+    # Phase 4: Prefix merging (MOVE TP PATTERN HERE, BEFORE SINGLE LETTER)
+    text = _MERGE_TP_PATTERN.sub("tp.", text)  # Match "t. p" or "t.p" or "t. p."
     text = _MERGE_TPH_PATTERN.sub("tp.", text)
     text = _MERGE_TX_PATTERN.sub("tx.", text)
     text = _MERGE_TT_PATTERN.sub("tt.", text)
     text = _ENSURE_SPACING_PATTERN.sub(r"\1 \2", text)
+    if debug:
+        print(f"AFTER PREFIX MERGING: '{text}'")
 
+    # NOW apply single-letter patterns AFTER merging is done
     text = _SINGLE_LETTER_PREFIX_PATTERN.sub(r"\1. ", text)
     text = _PREFIX_DIGIT_PATTERN1.sub(r"\1. \2 \3", text)
     text = _PREFIX_DIGIT_PATTERN2.sub(r"\1. \2", text)
     text = _PREFIX_DIGIT_PATTERN3.sub(r"\1. \2 \3", text)
+    if debug:
+        print(f"AFTER PREFIX DIGIT HANDLING: '{text}'")
 
     text = _CONCAT_ADMIN_PATTERN.sub(r"\1 \2", text)
     text = _ABBREVIATED_PREFIX_PATTERN.sub(r"\1. \2", text)
 
+    if debug:
+        print(f"AFTER CONCAT ADMIN HANDLING: '{text}'")
+
     # Phase 5: Add commas
     text = add_commas_before_admin_prefixes(text)
+
+    if debug:
+        print(f"AFTER ADDING COMMAS: '{text}'")
 
     # Phase 6: Final cleanup
     text = _DOUBLE_SPACE_PATTERN.sub(" ", text).strip()
     text = _DOUBLE_COMMA_PATTERN.sub(",", text)
     text = _TRAILING_COMMA_PATTERN.sub("", text)
 
-    # print(f"NORMALIZED: '{text}'")
+    if debug:
+        print(f"NORMALIZED: '{text}'")
+
     return text
 
 
@@ -228,6 +256,7 @@ for abbrev, full in sorted(ADMIN_ABBREVIATION_MAP.items(), key=lambda x: -len(x[
     _EXPANSION_PATTERNS.append((pattern, full + " "))
 
 
+@time_performance_measure
 def expand_abbreviations(normalized: str) -> str:
     for pattern, replacement in _EXPANSION_PATTERNS:
         normalized = pattern.sub(replacement, normalized)
@@ -292,10 +321,11 @@ def is_valid_admin_component(text: str, min_length: int = 3) -> bool:
 
 
 # ============================================================================
-# COMPONENT EXTRACTION (unchanged logic)
+# COMPONENT EXTRACTION
 # ============================================================================
 
 
+@time_performance_measure
 def suggest_address_components(address_input: str):
     def add_component(bucket, key, value):
         if value is None:
@@ -336,7 +366,7 @@ def suggest_address_components(address_input: str):
         "province": [],
         "district": [],
         "ward": [],
-        "normalized_raw_input": address_input,
+        "input": address_input,
         "remaining": None,
         "remaining_parts": [],
     }
@@ -551,21 +581,27 @@ def suggest_address_components(address_input: str):
 # MAIN PIPELINE
 # ============================================================================
 
-
-def process_address(address_input: str) -> dict:
-    normalized = normalize_input(address_input)
-    expanded = expand_abbreviations(normalized)
-    result = suggest_address_components(expanded)
-    return result
-
-
-def main():
+if __name__ == "__main__":
     import time
 
+    from segment import Trie
+    from spelling_correction import (
+        build_spelling_correction_trie,
+        correct_address_spelling,
+        load_vietnamese_dictionary,
+    )
+
+    # Load dictionary and build tries once
+    segment_dictionary = load_vietnamese_dictionary()
+    spelling_trie = build_spelling_correction_trie()
+    segment_trie = Trie()
+    for word in segment_dictionary:
+        segment_trie.insert(word.lower())
+
     tests = [
-        "X Tây Yên, H.An Biên, TKiên Giang",
-        "Thanh Long, Yên Mỹ Hưng Yên",
-        "X.Nga Thanh hyện Nga son TỉnhThanhQ Hóa",
+        # "X Tây Yên, H.An Biên, TKiên Giang",
+        # "Thanh Long, Yên Mỹ Hưng Yên",
+        # "X.Nga Thanh hyện Nga son TỉnhThanhQ Hóa",
         # " Duy Phú,  Duy Xuyen,  Quang Nam",
         # " Đức Lĩnh,Vũ Quang,",
         # "Thi trấ Ea. Knốp,H. Ea Kar,",
@@ -574,27 +610,34 @@ def main():
         # "Xã Thịnh Sơn H., Đô dương T. Nghệ An",
         # "Phưng Khâm Thiên Quận Đ.Đa T.Phố HàNội",
         # "Tiểu khu 3, thị trấn Ba Hàng, huyện Phổ Yên, tỉnh Thái Nguyên.",
-        # "PhườngNguyễn Trãi, T.P Kon Tum, T Kon Tum",
-        # "285 B/1A Bình Gĩa Phường 8,Vũng Tàu,Bà Rịa - Vũng Tàu",
-        # "Khu phố Nam Tân, TT Thuận Nam, Hàm Thuận Bắc, Bình Thuận.",
-        # "A:12A.21BlockA C/c BCA,P.AnKhánh,TP.Thủ Đức, TP. HCM",
-        # "14.5 Block A2, The Mansion, ĐS 7,KDC 13E,Ấp 5,PP,BC, TP.HCM",
+        "PhườngNguyễn Trãi, T.P Kon Tum, T Kon Tum",
+        "285 B/1A Bình Gĩa Phường 8,Vũng Tàu,Bà Rịa - Vũng Tàu",
+        "Khu phố Nam Tân, TT Thuận Nam, Hàm Thuận Bắc, Bình Thuận.",
+        "A:12A.21BlockA C/c BCA,P.AnKhánh,TP.Thủ Đức, TP. HCM",
+        "14.5 Block A2, The Mansion, ĐS 7,KDC 13E,Ấp 5,PP,BC, TP.HCM",
     ]
 
-    for test in tests:
-        print(f"\nInput: '{test}'")
+    # Test the spelling correction
+    for test_address in tests:
+        print(f"\nTesting address: {test_address}")
         start_time = time.perf_counter()
-        result = process_address(test)
+        normalized = normalize_input(test_address, debug=False)
+        print(f"NORMALIZED: {normalized}")
+        # segmented = segment_text_using_common_vn_words(test_address, segment_trie)
+        corrected_address, corrections = correct_address_spelling(
+            address=normalized,
+            spelling_trie=spelling_trie,
+            segment_trie=segment_trie,
+            debug=True,
+        )
+        expanded = expand_abbreviations(corrected_address)
+        result = suggest_address_components(expanded)
         end_time = time.perf_counter()
         elapsed_time_ms = (end_time - start_time) * 1000
         if elapsed_time_ms > 10:
             print(
                 f"WARNING: Pre-processing took {elapsed_time_ms:.4f} ms, exceeding 10ms limit."
             )
-        print(f"Pre-processing time: {elapsed_time_ms:.4f} ms")
-        print(result)
-        print()
-
-
-if __name__ == "__main__":
-    main()
+        else:
+            print(f"Pre-processing time: {elapsed_time_ms:.4f} ms")
+        print(f"SUGGESTION RESULT: {result}")
