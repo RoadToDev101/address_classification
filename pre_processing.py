@@ -98,7 +98,7 @@ _PROVINCE_ABBREV_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-_SINGLE_LETTER_PREFIX_PATTERN = re.compile(r"\b([xhqtp])\s+(?=[a-zà-ỹ])")
+_SINGLE_LETTER_PREFIX_PATTERN = re.compile(r"\b([xhqtp])\s+(?=[a-zà-ỹ\d])")
 _PREFIX_DIGIT_PATTERN1 = re.compile(r"([pq])(\d{1,2})([pq]\d{1,2})")
 _PREFIX_DIGIT_PATTERN2 = re.compile(r"\b([pq])(\d{1,2})\b")
 _PREFIX_DIGIT_PATTERN3 = re.compile(r"([pq])(\d{1,2})([a-zà-ỹ])")
@@ -175,7 +175,6 @@ def normalize_input(address_input: str, debug: bool = False) -> str:
     if debug:
         print(f"AFTER PREFIX MERGING: '{text}'")
 
-    # NOW apply single-letter patterns AFTER merging is done
     text = _SINGLE_LETTER_PREFIX_PATTERN.sub(r"\1. ", text)
     text = _PREFIX_DIGIT_PATTERN1.sub(r"\1. \2 \3", text)
     text = _PREFIX_DIGIT_PATTERN2.sub(r"\1. \2", text)
@@ -584,43 +583,28 @@ def suggest_address_components(address_input: str):
 if __name__ == "__main__":
     import time
 
-    from segment import Trie
-    from spelling_correction import (
-        build_spelling_correction_trie,
-        load_vietnamese_dictionary,
-    )
+    # from segment import Trie
+    # from spelling_correction import (
+    #     build_spelling_correction_trie,
+    #     load_vietnamese_dictionary,
+    # )
 
     # Load dictionary and build tries once
-    segment_dictionary = load_vietnamese_dictionary()
-    spelling_trie = build_spelling_correction_trie()
-    segment_trie = Trie()
-    for word in segment_dictionary:
-        segment_trie.insert(word.lower())
+    # segment_dictionary = load_vietnamese_dictionary()
+    # spelling_trie = build_spelling_correction_trie()
+    # segment_trie = Trie()
+    # for word in segment_dictionary:
+    #     segment_trie.insert(word.lower())
 
     tests = [
-        "X Tây Yên, H.An Biên, TKiên Giang",
-        "Thanh Long, Yên Mỹ Hưng Yên",
-        "X.Nga Thanh hyện Nga son TỉnhThanhQ Hóa",
-        " Duy Phú,  Duy Xuyen,  Quang Nam",
-        " Đức Lĩnh,Vũ Quang,",
-        "Thi trấ Ea. Knốp,H. Ea Kar,",
-        ", Nam Đông,T. T.T.H",
-        "P4 T.Ph9ốĐông Hà ",
-        "Xã Thịnh Sơn H., Đô dương T. Nghệ An",
-        "Phưng Khâm Thiên Quận Đ.Đa T.Phố HàNội",
-        "Tiểu khu 3, thị trấn Ba Hàng, huyện Phổ Yên, tỉnh Thái Nguyên.",
-        "PhườngNguyễn Trãi, T.P Kon Tum, T Kon Tum",
-        "285 B/1A Bình Gĩa Phường 8,Vũng Tàu,Bà Rịa - Vũng Tàu",
-        "Khu phố Nam Tân, TT Thuận Nam, Hàm Thuận Bắc, Bình Thuận.",
-        "A:12A.21BlockA C/c BCA,P.AnKhánh,TP.Thủ Đức, TP. HCM",
-        "14.5 Block A2, The Mansion, ĐS 7,KDC 13E,Ấp 5,PP,BC, TP.HCM",
+        "Phường Phú Đô, Quận Nam Từ Liêm, Thành phố H Nội",
     ]
 
     # Test the spelling correction
     for test_address in tests:
         print(f"\nTesting address: {test_address}")
         start_time = time.perf_counter()
-        normalized = normalize_input(test_address, debug=False)
+        normalized = normalize_input(test_address, debug=True)
         print(f"NORMALIZED: {normalized}")
         # segmented = segment_text_using_common_vn_words(test_address, segment_trie)
         # corrected_address, corrections = correct_address_spelling(

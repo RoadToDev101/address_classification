@@ -33,47 +33,40 @@ def evaluate_prediction(predicted: Dict, expected: Dict) -> Dict:
         "ward_match": None,
     }
 
+    # Get and title-case all predicted values first
+    predicted_provinces = predicted.get("province", {}).get("classified", [])
+    if predicted_provinces and predicted_provinces[0]:
+        predicted_province = predicted_provinces[0].title().strip()
+        result["province_match"] = predicted_province
+
+    predicted_districts = predicted.get("district", {}).get("classified", [])
+    if predicted_districts and predicted_districts[0]:
+        predicted_district = predicted_districts[0].title().strip()
+        result["district_match"] = predicted_district
+
+    predicted_wards = predicted.get("ward", {}).get("classified", [])
+    if predicted_wards and predicted_wards[0]:
+        predicted_ward = predicted_wards[0].title().strip()
+        result["ward_match"] = predicted_ward
+
+    # Now, perform comparisons if expected values exist
     # Check province
     if expected.get("province"):
-        predicted_provinces = predicted.get("province", {}).get("classified", [])
-        if predicted_provinces and predicted_provinces[0]:
-            predicted_province = predicted_provinces[0].lower().strip()
-            expected_province = expected["province"].lower().strip()
-            if (
-                predicted_province == expected_province
-                or expected_province in predicted_province
-                or predicted_province in expected_province
-            ):
-                result["province_correct"] = True
-                result["province_match"] = predicted_provinces[0]
+        expected_province = expected["province"].title().strip()
+        if result["province_match"] and result["province_match"] == expected_province:
+            result["province_correct"] = True
 
     # Check district
     if expected.get("district"):
-        predicted_districts = predicted.get("district", {}).get("classified", [])
-        if predicted_districts and predicted_districts[0]:
-            predicted_district = predicted_districts[0].lower().strip()
-            expected_district = expected["district"].lower().strip()
-            if (
-                predicted_district == expected_district
-                or expected_district in predicted_district
-                or predicted_district in expected_district
-            ):
-                result["district_correct"] = True
-                result["district_match"] = predicted_districts[0]
+        expected_district = expected["district"].title().strip()
+        if result["district_match"] and result["district_match"] == expected_district:
+            result["district_correct"] = True
 
     # Check ward
     if expected.get("ward"):
-        predicted_wards = predicted.get("ward", {}).get("classified", [])
-        if predicted_wards and predicted_wards[0]:
-            predicted_ward = predicted_wards[0].lower().strip()
-            expected_ward = expected["ward"].lower().strip()
-            if (
-                predicted_ward == expected_ward
-                or expected_ward in predicted_ward
-                or predicted_ward in expected_ward
-            ):
-                result["ward_correct"] = True
-                result["ward_match"] = predicted_wards[0]
+        expected_ward = expected["ward"].title().strip()
+        if result["ward_match"] and result["ward_match"] == expected_ward:
+            result["ward_correct"] = True
 
     return result
 
@@ -164,9 +157,9 @@ def run_comprehensive_test(
 
         # Prepare result data matching main.py format
         reasons = []
-        pred_province = safe_get_first(predicted, "province")
-        pred_district = safe_get_first(predicted, "district")
-        pred_ward = safe_get_first(predicted, "ward")
+        pred_province = evaluation["province_match"]
+        pred_district = evaluation["district_match"]
+        pred_ward = evaluation["ward_match"]
 
         if not evaluation["province_correct"]:
             reasons.append("province mismatch")
